@@ -14,7 +14,8 @@ hbs.registerPartials(__dirname + "/views/partials");
 (async () => {
   const puppeteer = require("puppeteer");
   const browser = await puppeteer.launch({
-    headless: true
+    headless: true,
+    args: ["--no-sandbox", "--disable-setuid-sandbox", "--single-process"]
     // Launch chromium using a proxy server on port 9876.
     // More on proxying:
     //    https://www.chromium.org/developers/design-documents/network-settings
