@@ -7,7 +7,7 @@ const ogameApi = require("./ogameApi.js");
 const mongoose = require("mongoose");
 const Bot = require("./classes/Bot");
 
-const port = process.env.PORT || 5000;
+const port = process.env.PORT || 3000;
 
 app.use(express.static(__dirname + "/public"));
 //Express HBS engine
@@ -40,6 +40,10 @@ const Player = require("./models/Players");
   await bot.begin("production");
   await bot.login("rodrigo.diazranilla@gmail.com", "phoneypeople");
   let playersToHunt = ["Geologist Rigel", "SekSek", "Tony Stark", "Peacemaker"];
+  //first execution
+  playersToHunt.forEach(playerToHunt => {
+    hunter(playerToHunt, bot);
+  });
   setInterval(() => {
     playersToHunt.forEach(playerToHunt => {
       hunter(playerToHunt, bot);
@@ -49,35 +53,44 @@ const Player = require("./models/Players");
 
 let hunter = (nickname, bot) => {
   Player.findOne({ nickname }, async (err, playerInfo) => {
-    if (!playerInfo) {
-      try {
-        let playerInfo = await ogameApi.getPlayerInfo(nickname);
-        console.log("la informacion del jugador es: ", playerInfo);
-        let player = new Player({
-          id: playerInfo.id,
-          nickname: playerInfo.nickname,
-          planets: playerInfo.planets,
-          notes: ""
-        });
-        await player.save();
-      } catch (error) {
-        console.log("err" + err);
-      }
-    }
-    let page = await bot.createNewPage();
-    let newPlayerInfo = await bot.hunter(playerInfo, page);
-    console.log("la nueva informacion del jugador es: ", newPlayerInfo);
-    Player.findOneAndUpdate(
-      { nickname },
-      newPlayerInfo,
-      { new: true },
-      (err, payload) => {
-        if (err) {
-          return new Error("Algo salio mal ...");
+    console.log("buscando información de jugadores...");
+    try {
+      var page = await bot.createNewPage();
+      if (!playerInfo) {
+        try {
+          let playerInfo = await ogameApi.getPlayerInfo(nickname);
+          console.log("la informacion del jugador es: ", playerInfo);
+          let player = new Player({
+            id: playerInfo.id,
+            nickname: playerInfo.nickname,
+            planets: playerInfo.planets,
+            notes: ""
+          });
+          await player.save();
+        } catch (error) {
+          console.log("err" + err);
         }
-        console.log("actualizado...", payload);
       }
-    );
+      let newPlayerInfo = await bot.hunter(playerInfo, page);
+      console.log("la nueva informacion del jugador es: ", newPlayerInfo);
+      Player.findOneAndUpdate(
+        { nickname },
+        newPlayerInfo,
+        { new: true },
+        (err, payload) => {
+          if (err) {
+            return new Error("Algo salio mal ...");
+          }
+          console.log("actualizado...", payload);
+        }
+      );
+      await page.close();
+    } catch (error) {
+      console.log("se dio un error en watchdog..probablemente el logeo");
+      console.log("el error es: ", error);
+      await bot.checkLoginStatus(page);
+      page = await bot.createNewPage();
+    }
   });
 };
 
