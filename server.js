@@ -1,41 +1,85 @@
 const express = require("express");
+var bodyParser = require("body-parser");
 const app = express();
 const hbs = require("hbs");
 require("./hbs/helpers/helpers");
+const ogameApi = require("./ogameApi.js");
+const mongoose = require("mongoose");
+const Bot = require("./classes/Bot");
 
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 5000;
 
 app.use(express.static(__dirname + "/public"));
 //Express HBS engine
 app.set("view engine", "hbs");
 hbs.registerPartials(__dirname + "/views/partials");
+
+// parse application/x-www-form-urlencoded
+app.use(bodyParser.urlencoded({ extended: false }));
+
+// parse application/json
+app.use(bodyParser.json());
+
 //Helpers
 
+//DB
+mongoose.connect(
+  "mongodb+srv://VictorJJF:Sed4cfv52309$@cluster0-ceisv.mongodb.net/pepebot",
+  {
+    useNewUrlParser: true
+  },
+  (err, res) => {
+    if (err) throw err;
+    console.log("DB online ONLINE");
+  }
+);
+
+const Player = require("./models/Players");
 (async () => {
-  const puppeteer = require("puppeteer");
-  const browser = await puppeteer.launch({
-    headless: true,
-    args: ["--no-sandbox", "--disable-setuid-sandbox", "--single-process"]
-    // Launch chromium using a proxy server on port 9876.
-    // More on proxying:
-    //    https://www.chromium.org/developers/design-documents/network-settings
-  });
-  const page = await browser.newPage();
-  await page.goto("https://www.expressvpn.com/es/what-is-my-ip");
-  await page.waitForSelector("p.ip-address");
-  let data = page.evaluate(() => {
-    var ip = document.querySelector("p.ip-address").innerText;
-    var local = document.querySelector(
-      ".col-right > .row-eq-height > .col-left-inner > .tool-panel__body > h4:nth-child(2)"
-    ).innerText;
-    var proveedor = document.querySelector(
-      ".col-right > .row-eq-height > .col-left-inner > .tool-panel__body > .mb-0"
-    ).innerText;
-    return { ip, local, proveedor };
-  });
-  console.log("tu ip es: ", await data);
-  //   await browser.close();
+  let bot = new Bot();
+  await bot.begin("production");
+  await bot.login("rodrigo.diazranilla@gmail.com", "phoneypeople");
+  let playersToHunt = ["Geologist Rigel", "SekSek", "Tony Stark", "Peacemaker"];
+  setInterval(() => {
+    playersToHunt.forEach(playerToHunt => {
+      hunter(playerToHunt, bot);
+    });
+  }, 20 * 60 * 1000);
 })();
+
+let hunter = (nickname, bot) => {
+  Player.findOne({ nickname }, async (err, playerInfo) => {
+    if (!playerInfo) {
+      try {
+        let playerInfo = await ogameApi.getPlayerInfo(nickname);
+        console.log("la informacion del jugador es: ", playerInfo);
+        let player = new Player({
+          id: playerInfo.id,
+          nickname: playerInfo.nickname,
+          planets: playerInfo.planets,
+          notes: ""
+        });
+        await player.save();
+      } catch (error) {
+        console.log("err" + err);
+      }
+    }
+    let page = await bot.createNewPage();
+    let newPlayerInfo = await bot.hunter(playerInfo, page);
+    console.log("la nueva informacion del jugador es: ", newPlayerInfo);
+    Player.findOneAndUpdate(
+      { nickname },
+      newPlayerInfo,
+      { new: true },
+      (err, payload) => {
+        if (err) {
+          return new Error("Algo salio mal ...");
+        }
+        console.log("actualizado...", payload);
+      }
+    );
+  });
+};
 
 app.get("/", (req, res) => {
   res.render("home", {
@@ -46,6 +90,92 @@ app.get("/", (req, res) => {
 
 app.get("/about", (req, res) => {
   res.render("about");
+});
+
+let playersToHunt = [];
+
+app.get("/hunter", (req, res) => {
+  console.log("brus");
+  res.render("hunter", { playersToHunt });
+});
+
+app.get("/api/hunter", async (req, res) => {
+  let playerInfo = await ogameApi.getPlayerInfo("Emperor Fidis");
+  res.json({ ok: true, playerInfo });
+});
+
+app.post("/api/players", async (req, res) => {
+  let playerInfo = await ogameApi.getPlayerInfo("Emperor Fidis");
+  console.log("la informacion del jugador es: ", playerInfo);
+  body = req.body;
+  let player = new Player({
+    id: playerInfo.id,
+    nickname: playerInfo.nickname,
+    planets: playerInfo.planets,
+    notes: ""
+  });
+  player.save((err, playerDB) => {
+    if (err) {
+      return res.status(400).json({
+        ok: false,
+        err
+      });
+    }
+    res.json({
+      ok: true,
+      playerDB
+    });
+  });
+});
+
+app.post("/api/activities", (req, res) => {
+  Player.find({ nickname: "Emperor Fidis" }).exec((err, playerInfo) => {
+    if (err) {
+      return res.status(400).json({
+        ok: false,
+        err
+      });
+    }
+    let planets = playerInfo[0].planets;
+    planets.forEach(planet => {
+      console.log(planet);
+    });
+    res.json({
+      ok: true
+    });
+  });
+});
+
+app.post("/api/players", async (req, res) => {
+  let playerInfo = await ogameApi.getPlayerInfo("Emperor Fidis");
+  console.log("la informacion del jugador es: ", playerInfo);
+  body = req.body;
+  let player = new Player({
+    id: playerInfo.id,
+    nickname: playerInfo.nickname,
+    planets: playerInfo.planets,
+    notes: ""
+  });
+  player.save((err, playerDB) => {
+    if (err) {
+      return res.status(400).json({
+        ok: false,
+        err
+      });
+    }
+    res.json({
+      ok: true,
+      playerDB
+    });
+  });
+});
+
+app.post("/api/hunter", (req, res) => {
+  console.log("recibi estos datos: ", req.body.playerName);
+  res.redirect("/hunter");
+  let playerToHunt = req.body.playerName;
+  playersToHunt.push(playerToHunt);
+  console.log("ahora los jugadores son: ", playersToHunt);
 });
 
 app.listen(port, () => {

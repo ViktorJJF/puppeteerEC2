@@ -1,0 +1,22 @@
+{{> head }}
+
+
+{{> navbar }}
+<div class="container mt-5">
+    <form action="/api/hunter" method="POST">
+        <div class=" form-group">
+            <label for="exampleInputEmail1">Nombre delee jugador a Controlar</label>
+            <input name="playerName" type="text" class="form-control" id="exampleInputEmail1"
+                placeholder="ESCRIBE SU NICK">
+        </div>
+        <button type="submit" class="btn btn-primary">Agregar Jugador</button>
+    </form>
+    <h1>Jugadores a mupear</h1>
+    {{playersToHunt}}
+
+
+</div>
+<script>
+    console.log("gaea alpaca")
+</script>
+{{> footer}}
