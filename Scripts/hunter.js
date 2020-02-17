@@ -47,7 +47,7 @@ async function beginHunter(nickname, bot) {
       console.log("esperando 5 segundos para proximo hunter");
       console.log("se empezara nufevo bucle");
       console.log("esperando 5 segundos");
-      await timeout(5 * 1000);
+      await timeout(20 * 60 * 1000);
       console.log("se termino de esperar los 5 seg");
     } catch (error) {
       console.log("se dio un error en hunter..probablemente el logeo");
