@@ -52,6 +52,7 @@ const getPlanetsCoordinates = playerId => {
               name: planet["$"].name,
               coords: planet["$"].coords,
               planetType: "planet",
+              active: true,
               activities: []
             });
             if (planet.hasOwnProperty("moon")) {
@@ -59,6 +60,7 @@ const getPlanetsCoordinates = playerId => {
                 name: planet.moon[0]["$"].name,
                 coords: planet["$"].coords,
                 planetType: "moon",
+                active: true,
                 activities: []
               });
             }

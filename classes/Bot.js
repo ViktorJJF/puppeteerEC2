@@ -14,8 +14,8 @@ module.exports = class Bot {
     this.language = null;
     this.telegramGroupId = null;
     this.telegramId = null;
-    this.ogameEmail = "rodrigo.diazranilla@gmail.com";
-    this.ogamePassword = "phoneypeople";
+    this.ogameEmail = "viktor.developer96@gmail.com";
+    this.ogamePassword = "sed4cfv52309$";
     this.state = null;
     this.userId = null;
     this.page = null;
@@ -55,7 +55,7 @@ module.exports = class Bot {
       const pathToExtension =
         "C:\\Users\\JIMENEZ\\AppData\\Local\\Google\\Chrome\\User Data\\Default\\Extensions\\mjnbclmflcpookeapghfhapeffmpodij\\1.5.4_0";
       this.browser = await puppeteer.launch({
-        headless: true,
+        headless: false,
         args: [
           `--disable-extensions-except=${pathToExtension}`,
           `--load-extension=${pathToExtension}`
@@ -418,12 +418,33 @@ module.exports = class Bot {
     planetType == "planet"
       ? console.log(player, "Empezando a escanear planeta: ", coords)
       : console.log(player, "Empezando a escanear luna: ", coords);
-
-    if (planetType == "planet")
-      await page.waitForSelector(
+    await timeout(3000);
+    let planetExist;
+    if (planetType == "planet") {
+      planetExist = await page.$(
         `tr.row>td[rel="planet${planet}"]>.ListImage>a>img.planetTooltip`
       );
-    else await page.waitForSelector(`tr.row>td[rel="moon${planet}"]`);
+    } else {
+      planetExist = await page.$(`tr.row>td[rel="moon${planet}"]`);
+    }
+    if (!planetExist) {
+      console.log("el planeta no existe");
+      return false;
+    }
+    // if (planetType == "planet")
+    //   await page
+    //     .waitForSelector(
+    //       `tr.row>td[rel="planet${planet}"]>.ListImage>a>img.planetTooltip`
+    //     )
+    //     .catch(err => {
+    //       console.log("el error en planetActivity:", err);
+    //     });
+    // else
+    //   await page
+    //     .waitForSelector(`tr.row>td[rel="moon${planet}"]`)
+    //     .catch(err => {
+    //       console.log("erroe en luna: ", err);
+    //     });
     // await timeout(2500);
     var planetActivity = {
       date: new Date(),

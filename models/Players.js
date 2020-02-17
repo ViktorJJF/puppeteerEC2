@@ -20,7 +20,11 @@ let playersSchema = new Schema({
           date: Date,
           lastActivity: String
         }
-      ]
+      ],
+      active: {
+        type: Boolean,
+        default: true
+      }
     }
   ],
   notes: String

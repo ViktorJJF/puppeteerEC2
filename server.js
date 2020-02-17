@@ -6,8 +6,9 @@ require("./hbs/helpers/helpers");
 const ogameApi = require("./ogameApi.js");
 const mongoose = require("mongoose");
 const Bot = require("./classes/Bot");
+const hunter = require("./Scripts/hunter.js");
 
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 5000;
 
 app.use(express.static(__dirname + "/public"));
 //Express HBS engine
@@ -35,64 +36,31 @@ mongoose.connect(
 );
 
 const Player = require("./models/Players");
+let bot = new Bot();
 (async () => {
-  let bot = new Bot();
   await bot.begin("production");
   await bot.login("rodrigo.diazranilla@gmail.com", "phoneypeople");
-  let playersToHunt = ["Geologist Rigel", "SekSek", "Tony Stark", "Peacemaker"];
+  let playersToHunt = await Player.find();
   //first execution
+  // let playersToHunt = [
+  //   "Edipo",
+  //   "Peacemaker",
+  //   "The HadeS",
+  //   "Coronavirus",
+  //   "SekSek",
+  //   "Makavrox",
+  //   "Atrevete",
+  //   "Man Yun Kin",
+  //   "Miss Dark",
+  //   "Nanatzu No Taisai",
+  //   "Xendor",
+  //   "Lyram",
+  //   "Lord Tycho"
+  // ];
   playersToHunt.forEach(playerToHunt => {
-    hunter(playerToHunt, bot);
+    hunter(playerToHunt.nickname, bot);
   });
-  setInterval(() => {
-    playersToHunt.forEach(playerToHunt => {
-      hunter(playerToHunt, bot);
-    });
-  }, 20 * 60 * 1000);
 })();
-
-let hunter = (nickname, bot) => {
-  Player.findOne({ nickname }, async (err, playerInfo) => {
-    console.log("buscando información de jugadores...");
-    try {
-      var page = await bot.createNewPage();
-      if (!playerInfo) {
-        try {
-          let playerInfo = await ogameApi.getPlayerInfo(nickname);
-          console.log("la informacion del jugador es: ", playerInfo);
-          let player = new Player({
-            id: playerInfo.id,
-            nickname: playerInfo.nickname,
-            planets: playerInfo.planets,
-            notes: ""
-          });
-          await player.save();
-        } catch (error) {
-          console.log("err" + err);
-        }
-      }
-      let newPlayerInfo = await bot.hunter(playerInfo, page);
-      console.log("la nueva informacion del jugador es: ", newPlayerInfo);
-      Player.findOneAndUpdate(
-        { nickname },
-        newPlayerInfo,
-        { new: true },
-        (err, payload) => {
-          if (err) {
-            return new Error("Algo salio mal ...");
-          }
-          console.log("actualizado...", payload);
-        }
-      );
-      await page.close();
-    } catch (error) {
-      console.log("se dio un error en watchdog..probablemente el logeo");
-      console.log("el error es: ", error);
-      await bot.checkLoginStatus(page);
-      page = await bot.createNewPage();
-    }
-  });
-};
 
 app.get("/", (req, res) => {
   res.render("home", {
@@ -105,10 +73,8 @@ app.get("/about", (req, res) => {
   res.render("about");
 });
 
-let playersToHunt = [];
-
-app.get("/hunter", (req, res) => {
-  console.log("brus");
+app.get("/hunter", async (req, res) => {
+  let playersToHunt = await Player.find();
   res.render("hunter", { playersToHunt });
 });
 
@@ -118,27 +84,35 @@ app.get("/api/hunter", async (req, res) => {
 });
 
 app.post("/api/players", async (req, res) => {
-  let playerInfo = await ogameApi.getPlayerInfo("Emperor Fidis");
-  console.log("la informacion del jugador es: ", playerInfo);
-  body = req.body;
-  let player = new Player({
-    id: playerInfo.id,
-    nickname: playerInfo.nickname,
-    planets: playerInfo.planets,
-    notes: ""
-  });
-  player.save((err, playerDB) => {
-    if (err) {
-      return res.status(400).json({
-        ok: false,
-        err
-      });
-    }
-    res.json({
-      ok: true,
-      playerDB
-    });
-  });
+  let body = req.body;
+  let nickname = body.nickname;
+  let playerInfo = await ogameApi.getPlayerInfo(nickname);
+  // let player = new Player({
+  //   id: playerInfo.id,
+  //   nickname: playerInfo.nickname,
+  //   planets: playerInfo.planets,
+  //   notes: ""
+  // });
+  // playerInfo = await player.save();
+  // if (playerInfo) hunter(nickname, bot);
+  console.log("esta es su info: ", playerInfo);
+  res.redirect("/hunter");
+});
+
+app.post("/api/players/planet", async (req, res) => {
+  let body = req.body;
+  let nickname = body.nickname;
+  let newPlanet = {
+    id: body.id,
+    name: body.name,
+    coords: body.coords,
+    planetType: body.planetType,
+    activities: []
+  };
+  let playerToUpdate = await Player.findOne({ nickname });
+  playerToUpdate.planets.push(newPlanet);
+  await playerToUpdate.save();
+  res.redirect("/hunter");
 });
 
 app.post("/api/activities", (req, res) => {
@@ -185,9 +159,9 @@ app.post("/api/players", async (req, res) => {
 
 app.post("/api/hunter", (req, res) => {
   console.log("recibi estos datos: ", req.body.playerName);
-  res.redirect("/hunter");
   let playerToHunt = req.body.playerName;
   playersToHunt.push(playerToHunt);
+  res.redirect("/hunter");
   console.log("ahora los jugadores son: ", playersToHunt);
 });
 

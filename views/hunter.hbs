@@ -3,16 +3,66 @@
 
 {{> navbar }}
 <div class="container mt-5">
-    <form action="/api/hunter" method="POST">
-        <div class=" form-group">
-            <label for="exampleInputEmail1">Nombre delee jugador a Controlar</label>
-            <input name="playerName" type="text" class="form-control" id="exampleInputEmail1"
-                placeholder="ESCRIBE SU NICK">
-        </div>
-        <button type="submit" class="btn btn-primary">Agregar Jugador</button>
-    </form>
     <h1>Jugadores a mupear</h1>
-    {{playersToHunt}}
+    <ul>
+        {{#each playersToHunt}}
+        <li>
+            {{nickname}}
+        </li>
+        {{/each}}
+    </ul>
+    <form action="/api/players" method="POST">
+        <div class="container">
+            <div class="row d-flex align-content-center">
+                <div class="col-10">
+                    <div class=" form-group">
+                        <label for="exampleInputEmail1">Nombre del jugador a Controlar</label>
+                        <input name="nickname" type="text" class="form-control" id="exampleInputEmail1"
+                            placeholder="ESCRIBE SU NICK">
+                    </div>
+                </div>
+
+                <div class="col-2"><button type="submit" class="btn btn-primary">Agregar Jugador</button>
+                </div>
+            </div>
+        </div>
+
+    </form>
+    <h3>Agregar planeta/Luna</h3>
+    <form action="/api/players/planet" method="POST">
+        <div class="form-group">
+            <label for="playerNameInput">Nombre del jugador</label>
+            <select name="nickname" class="custom-select" id="playerNameInput">
+                {{#each playersToHunt}}
+                <option value="{{nickname}}">{{nickname}}</option>
+                {{/each}}
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="inputID">ID</label>
+            <input name="id" placeholder="ID del planeta/luna" type="text" class="form-control" id="inputID"
+                aria-describedby="emailHelp">
+        </div>
+        <div class="form-group">
+            <label for="inputName">Nombre</label>
+            <input name="name" placeholder="Nombre del planeta/luna" type="text" class="form-control" id="inputName"
+                aria-describedby="emailHelp">
+        </div>
+        <div class="form-group">
+            <label for="inputCoords">Coordenadas</label>
+            <input name="coords" placeholder="Coordenadas planeta/luna" type="text" class="form-control"
+                id="inputCoords" aria-describedby="emailHelp">
+        </div>
+        <div class="form-group">
+            <label for="inputType">Tipo</label>
+            <select name="planetType" class="form-control" id="inputType">
+                <option value="planet">Planeta</option>
+                <option value="moon">Luna</option>
+            </select>
+        </div>
+        <button type="submit" class="btn btn-primary">Agregar</button>
+    </form>
+
 
 
 </div>
