@@ -170,6 +170,7 @@ module.exports = class Bot {
     switch (currentPage) {
       case "mainPage":
         console.log("no paso nada.. seguimos normal");
+        await page.close();
         break;
       case "playPage":
         console.log("nos encontramos en vista playPage");
@@ -180,6 +181,7 @@ module.exports = class Bot {
           page,
           this.browser
         );
+        await page.close();
         break;
       case "selectUniversePage":
         console.log("nos encontramos en vista universo");
@@ -191,6 +193,7 @@ module.exports = class Bot {
         );
         console.log("se termino el click and wait");
         //main page ogame
+        await page.close();
         break;
       default:
         console.log("el caso default: a logearse");
@@ -360,7 +363,7 @@ module.exports = class Bot {
     await page.waitForSelector(
       "#galaxycomponent > #inhalt > #galaxyHeader > form > .btn_blue:nth-child(9)"
     );
-    await timeout(1000);
+    // await timeout(1000);
     await page.click(
       "#galaxycomponent > #inhalt > #galaxyHeader > form > .btn_blue:nth-child(9)"
     );
@@ -418,7 +421,7 @@ module.exports = class Bot {
     planetType == "planet"
       ? console.log(player, "Empezando a escanear planeta: ", coords)
       : console.log(player, "Empezando a escanear luna: ", coords);
-    await timeout(3000);
+    // await timeout(3000);
     let planetExist;
     if (planetType == "planet") {
       planetExist = await page.$(

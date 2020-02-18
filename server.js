@@ -7,6 +7,9 @@ const ogameApi = require("./ogameApi.js");
 const mongoose = require("mongoose");
 const Bot = require("./classes/Bot");
 const hunter = require("./Scripts/hunter.js");
+const { timeout } = require("./utils/utils.js");
+const Player = require("./models/Players");
+const { PendingXHR } = require("pending-xhr-puppeteer");
 
 const port = process.env.PORT || 5000;
 
@@ -35,11 +38,10 @@ mongoose.connect(
   }
 );
 
-const Player = require("./models/Players");
 let bot = new Bot();
 (async () => {
-  await bot.begin("production");
-  await bot.login("rodrigo.diazranilla@gmail.com", "phoneypeople");
+  await bot.begin("dev");
+  await bot.login("viktor.developer96@gmail.com", "sed4cfv52309$");
   let playersToHunt = await Player.find();
   //first execution
   // let playersToHunt = [
@@ -55,11 +57,15 @@ let bot = new Bot();
   //   "Nanatzu No Taisai",
   //   "Xendor",
   //   "Lyram",
-  //   "Lord Tycho"
+  //   "Lord Tycho",
+  //   "EN VENTA"
   // ];
-  playersToHunt.forEach(playerToHunt => {
-    hunter(playerToHunt.nickname, bot);
-  });
+  while (1 == 1) {
+    for (const playerToHunt of playersToHunt) {
+      await hunter(playerToHunt, bot);
+    }
+    await timeout(20 * 60 * 1000);
+  }
 })();
 
 app.get("/", (req, res) => {
@@ -163,6 +169,41 @@ app.post("/api/hunter", (req, res) => {
   playersToHunt.push(playerToHunt);
   res.redirect("/hunter");
   console.log("ahora los jugadores son: ", playersToHunt);
+});
+
+app.get("/api/scan", async (req, res) => {
+  let nickname = req.query.nickname;
+  let playerInfo = await Player.findOne({ nickname });
+  if (!playerInfo) {
+    playerInfo = await ogameApi.getPlayerInfo(nickname);
+    // let player = new Player({
+    //   id: playerApi.id,
+    //   nickname: playerApi.nickname,
+    //   planets: playerApi.planets,
+    //   notes: ""
+    // });
+    // playerInfo = await player.save();
+  }
+  var page = await bot.createNewPage();
+  const pendingXHR = new PendingXHR(page);
+  for (const planet of playerInfo.planets) {
+    planet.activities = [];
+    if (planet.active) {
+      let activity = await bot.checkPlanetActivity(
+        planet.coords,
+        planet.planetType,
+        playerInfo.nickname,
+        page,
+        pendingXHR
+      );
+      if (!activity) {
+        planet.active = false;
+        // await playerInfo.save();
+      } else planet.activities.push(activity);
+    }
+  }
+  await page.close();
+  res.json({ ok: true, playerInfo });
 });
 
 app.listen(port, () => {
