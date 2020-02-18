@@ -8,7 +8,6 @@ async function beginHunter(nickname, bot) {
   console.log("empezando nueva vuelta");
   try {
     let playerInfo = await Player.findOne({ nickname });
-    console.log("la informacion del jugador es: ", playerInfo);
     if (!playerInfo) {
       let playerApi = await ogameApi.getPlayerInfo(nickname);
       let player = new Player({
@@ -43,16 +42,11 @@ async function beginHunter(nickname, bot) {
     await playerInfo.save();
     //end hunter
     await page.close();
-    console.log("esperando 5 segundos para proximo hunter");
-    console.log("se empezara nufevo bucle");
-    console.log("esperando 5 segundos");
-
     console.log("se termino de esperar los 5 seg");
   } catch (error) {
     console.log("se dio un error en hunter..probablemente el logeo");
     console.log("el error es: ", error);
     await bot.checkLoginStatus(page);
-    page = await bot.createNewPage();
   }
 }
 
