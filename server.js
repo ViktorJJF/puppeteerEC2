@@ -64,7 +64,7 @@ let bot = new Bot();
     for (const playerToHunt of playersToHunt) {
       await hunter(playerToHunt, bot);
     }
-    await timeout(20 * 60 * 1000);
+    await timeout(15 * 60 * 1000);
   }
 })();
 
