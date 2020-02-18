@@ -40,7 +40,7 @@ mongoose.connect(
 
 let bot = new Bot();
 (async () => {
-  await bot.begin("dev");
+  await bot.begin("prod");
   await bot.login("viktor.developer96@gmail.com", "sed4cfv52309$");
   let playersToHunt = await Player.find();
   //first execution
