@@ -39,10 +39,12 @@ mongoose.connect(
 );
 
 let bot = new Bot();
+let playersToHunt = [];
+
 (async () => {
-  await bot.begin("prod");
-  await bot.login("viktor.developer96@gmail.com", "sed4cfv52309$");
-  let playersToHunt = await Player.find();
+  await bot.begin("dev");
+  await bot.login("jimenezflorestacna@gmail.com", "sed4cfv52309@");
+  // await bot.login("rodrigo.diazranilla@gmail.com", "phoneypeople");
   //first execution
   // let playersToHunt = [
   //   "Edipo",
@@ -61,9 +63,15 @@ let bot = new Bot();
   //   "EN VENTA",
   //   "Renegade Ferret"
   // ];
+  let playersFromDB = await Player.find();
+  playersFromDB.forEach(player => {
+    console.log("inicializando los jugadores");
+    playersToHunt.push(player.nickname);
+  });
+  console.log("players to hunt es: ", playersToHunt);
   while (1 == 1) {
     for (const playerToHunt of playersToHunt) {
-      await hunter(playerToHunt.nickname, bot);
+      await hunter(playerToHunt, bot);
     }
     await timeout(15 * 60 * 1000);
   }
@@ -93,15 +101,22 @@ app.get("/api/hunter", async (req, res) => {
 app.post("/api/players", async (req, res) => {
   let body = req.body;
   let nickname = body.nickname;
+  console.log("se agregara al jugador: ", nickname);
   let playerInfo = await ogameApi.getPlayerInfo(nickname);
-  // let player = new Player({
-  //   id: playerInfo.id,
-  //   nickname: playerInfo.nickname,
-  //   planets: playerInfo.planets,
-  //   notes: ""
-  // });
-  // playerInfo = await player.save();
-  // if (playerInfo) hunter(nickname, bot);
+  if (playerInfo) {
+    let player = new Player({
+      id: playerInfo.id,
+      nickname: playerInfo.nickname,
+      planets: playerInfo.planets,
+      notes: ""
+    });
+    playerInfo = await player.save();
+    console.log("agregando a lista de hunteados...");
+    playersToHunt.push(playerInfo.nickname);
+  } else {
+    console.log("no se encontro su informacion y no se agrego...");
+  }
+
   console.log("esta es su info: ", playerInfo);
   res.redirect("/hunter");
 });
@@ -173,7 +188,7 @@ app.post("/api/hunter", (req, res) => {
 });
 
 app.get("/api/scan", async (req, res) => {
-  let nickname = req.query.nickname;
+  let nickname = req.query.nickname.toLowerCase();
   let playerInfo = await Player.findOne({ nickname });
   if (!playerInfo) {
     playerInfo = await ogameApi.getPlayerInfo(nickname);
@@ -185,26 +200,30 @@ app.get("/api/scan", async (req, res) => {
     // });
     // playerInfo = await player.save();
   }
-  var page = await bot.createNewPage();
-  const pendingXHR = new PendingXHR(page);
-  for (const planet of playerInfo.planets) {
-    planet.activities = [];
-    if (planet.active) {
-      let activity = await bot.checkPlanetActivity(
-        planet.coords,
-        planet.planetType,
-        playerInfo.nickname,
-        page,
-        pendingXHR
-      );
-      if (!activity) {
-        planet.active = false;
-        // await playerInfo.save();
-      } else planet.activities.push(activity);
+  if (playerInfo) {
+    var page = await bot.createNewPage();
+    const pendingXHR = new PendingXHR(page);
+    for (const planet of playerInfo.planets) {
+      planet.activities = [];
+      if (planet.active) {
+        let activity = await bot.checkPlanetActivity(
+          planet.coords,
+          planet.planetType,
+          playerInfo.nickname,
+          page,
+          pendingXHR
+        );
+        if (!activity) {
+          planet.active = false;
+          // await playerInfo.save();
+        } else planet.activities.push(activity);
+      }
     }
+    await page.close();
+    res.json({ ok: true, playerInfo });
+  } else {
+    res.json({ ok: true, playerInfo: {} });
   }
-  await page.close();
-  res.json({ ok: true, playerInfo });
 });
 
 app.listen(port, () => {

@@ -19,7 +19,7 @@ const getPlayerId = nickName => {
         parseString(res.data, function(err, result) {
           let players = result.players.player;
           players.forEach(player => {
-            if (player["$"].name == nickName) {
+            if (player["$"].name.toLowerCase() == nickName) {
               resolve(player["$"].id);
             }
           });
@@ -77,6 +77,7 @@ const getPlanetsCoordinates = playerId => {
 
 const getPlayerInfo = async nickname => {
   console.log("obteniendo información del jugador: ", nickname);
+  var nickname = nickname.toLowerCase();
   let playerInfo = { id: 0, nickname: nickname, planets: [] };
   try {
     player = await getPlayerId(nickname);
