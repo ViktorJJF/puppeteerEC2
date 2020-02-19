@@ -174,6 +174,7 @@ module.exports = class Bot {
         break;
       case "playPage":
         console.log("nos encontramos en vista playPage");
+        await page.waitForSelector("#joinGame>a>button.button");
         await page.click("#joinGame>a>button.button");
         await page.waitForSelector('.rt-td.action-cell>button[type="button"]');
         page = await this.clickAndWaitForTarget(

@@ -58,7 +58,8 @@ let bot = new Bot();
   //   "Xendor",
   //   "Lyram",
   //   "Lord Tycho",
-  //   "EN VENTA"
+  //   "EN VENTA",
+  //   "Renegade Ferret"
   // ];
   while (1 == 1) {
     for (const playerToHunt of playersToHunt) {
