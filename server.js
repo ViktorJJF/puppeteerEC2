@@ -162,7 +162,12 @@ app.post("/api/activities", (req, res) => {
 
 app.get("/api/players", async (req, res) => {
   try {
-    let playersToHunt = await Player.find();
+    let nickname = req.query.nickname;
+    let playersToHunt;
+    if (nickname) {
+      nickname = nickname.toLowerCase();
+      playersToHunt = await Player.find({ nickname });
+    } else playersToHunt = await Player.find();
     res.json({ ok: true, playersToHunt });
   } catch (error) {
     res.json({ ok: false, msg: "algo salio mal..." });
