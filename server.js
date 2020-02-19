@@ -93,6 +93,11 @@ app.get("/hunter", async (req, res) => {
   res.render("hunter", { playersToHunt });
 });
 
+app.get("/graficas", async (req, res) => {
+  let playersToHunt = await Player.find();
+  res.render("graphics", { playersToHunt });
+});
+
 app.get("/api/hunter", async (req, res) => {
   let playerInfo = await ogameApi.getPlayerInfo("Emperor Fidis");
   res.json({ ok: true, playerInfo });
@@ -153,6 +158,15 @@ app.post("/api/activities", (req, res) => {
       ok: true
     });
   });
+});
+
+app.get("/api/players", async (req, res) => {
+  try {
+    let playersToHunt = await Player.find();
+    res.json({ ok: true, playersToHunt });
+  } catch (error) {
+    res.json({ ok: false, msg: "algo salio mal..." });
+  }
 });
 
 app.post("/api/players", async (req, res) => {
