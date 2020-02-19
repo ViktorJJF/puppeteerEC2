@@ -42,7 +42,7 @@ let bot = new Bot();
 let playersToHunt = [];
 
 (async () => {
-  await bot.begin("dev");
+  await bot.begin("prod");
   await bot.login("jimenezflorestacna@gmail.com", "sed4cfv52309@");
   // await bot.login("rodrigo.diazranilla@gmail.com", "phoneypeople");
   //first execution
