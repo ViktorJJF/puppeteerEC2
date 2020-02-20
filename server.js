@@ -68,6 +68,7 @@ let playersToHunt = [];
     console.log("inicializando los jugadores");
     playersToHunt.push(player.nickname);
   });
+  playersFromDB = null;
   console.log("players to hunt es: ", playersToHunt);
   while (1 == 1) {
     for (const playerToHunt of playersToHunt) {

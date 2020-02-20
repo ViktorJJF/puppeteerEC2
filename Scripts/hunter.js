@@ -41,6 +41,7 @@ async function beginHunter(nickname, bot) {
       }
     }
     await playerInfo.save();
+    playerInfo = null;
     //end hunter
     await page.close();
     console.log("se termino de esperar los 5 seg");
