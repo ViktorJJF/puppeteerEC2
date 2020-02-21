@@ -7,3 +7,23 @@ footer {
     text-align: center;
     padding: 20px;
 }
+
+.ogameActivity {
+    font-weight: 500;
+}
+
+.onState {
+    color: #AC2222;
+}
+
+.minuteState {
+    color: #F39C11;
+}
+
+.offState {
+    color: #45A21A;
+}
+
+.moon {
+    background-color: #E9ECEF;
+}

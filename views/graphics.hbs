@@ -2,30 +2,48 @@
 
 
 {{> navbar }}
-{{dates.0.20.13}}
+{{!-- {{dates.0.20.13}} --}}
 <div class="ml-5 mt-5">
-    <table class="table">
+    <h1>Actividades de: {{playerToHunt.nickname}} - {{k}}</h1>
+    {{#each playerToHunt.[planets].[0].[dates] as |date k|}}
+    <h3>Fecha: {{getDateByDay k}}</h3>
+    <table class="table table-bordered">
         <thead class="thead-dark">
             <tr>
                 <th scope="col">#</th>
-                <th scope="col">Planeta</th>
+                <th scope="col">Nombre</th>
                 <th scope="col">Coordenada</th>
-                {{#each times}}
+                <th scope="col">Tipo</th>
+                {{#each ../times}}
                 <th scope="col">{{this}}</th>
                 {{/each}}
             </tr>
         </thead>
         <tbody>
-            {{#each playersToHunt.[planets]}}
-            <tr>
-                <th scope="row">{{@index}}</th>
-                <td>{{name}}</td>
-                <td>{{coords}}</td>
-                {{!-- {{#each ../dates.[@index].[20].[13]}}
+            {{#each ../playerToHunt.[planets] as |player i|}}
+            <tr class="{{#if_eq player.planetType 'moon'}}moon{{/if_eq}}">
+                <th scope="row">{{index i}}</th>
+                <td class="font-weight-bold">{{player.name}}</td>
+                <td class="font-weight-bold">{{player.coords}}</td>
+                <td class="font-weight-bold">{{#if_eq player.planetType 'moon'}}Luna{{else}}{{#if_eq i '0'}}Planeta
+                    Principal{{else}}Planeta{{/if_eq}}{{/if_eq}}</td>
+                {{#each (getHours player.dates k)}}
+                {{!-- <td>Key: {{@key}} Value = {{this}}</td> --}}
+                {{!-- <td>{{#each this}} <p> <span class="onState">{{formatIso this.date}}{{this.lastActivity}}</span> </p>
+                    {{/each}}</td> --}}
+                <td>{{#each this}} <p> <span
+                            class="ogameActivity {{#if_eq this.lastActivity 'on'}}onState{{else}}{{#if_eq this.lastActivity 'off'}}offState{{else}}minuteState{{/if_eq}}{{/if_eq}}">
+                            {{this.lastActivity}}</span>
+                    </p>
+                    {{/each}}</td>
+                {{/each}}
+                {{!-- {{getDates ../dates i}} --}}
+                {{!-- {{#each ../dates.[i].[20].[21]}}
                 <td>gaea</td>
                 {{/each}} --}}
             </tr>
             {{/each}}
         </tbody>
     </table>
+    {{/each}}
 </div>

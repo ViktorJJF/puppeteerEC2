@@ -35,7 +35,6 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
 //Helpers
-
 //DB
 mongoose.connect(
   "mongodb+srv://VictorJJF:Sed4cfv52309$@cluster0-ceisv.mongodb.net/pepebot",
@@ -107,8 +106,8 @@ app.get("/hunter", async (req, res) => {
 });
 
 app.get("/graficas", async (req, res) => {
-  let playersToHunt = await Player.findOne({ nickname: "cosaco" });
-  let planets = playersToHunt.planets;
+  let playerToHunt = await Player.findOne({ nickname: "en venta" });
+  let planets = playerToHunt.planets;
   var x = 60; //minutes interval
   var times = []; // time array
   var tt = 0; // start time
@@ -155,12 +154,20 @@ app.get("/graficas", async (req, res) => {
   // console.log(JSON.stringify(dates));
 
   // dates.forEach(date => {
-  console.log(dates[0]["20"]["1"]);
+  // console.log(dates[0]["20"]["1"]);
+  // // });
+  // dates[0]["20"]["13"].forEach(date => {
+  //   console.log(formatISO9075(date.date));
   // });
-  dates[0]["20"]["13"].forEach(date => {
-    console.log(formatISO9075(date.date));
-  });
-  res.render("graphics", { playersToHunt, planets, times, dates });
+  for (let i = 0; i < planets.length; i++) {
+    planets[i].dates = dates[i];
+  }
+  // planets.forEach((planet, i) => {
+  //   console.log("planeta :", i, planet.dates);
+  // });
+  let totalDays = Object.keys(dates[0]).length;
+  console.log("el total es: ", totalDays);
+  res.render("graphics", { playerToHunt, planets, times, dates, totalDays });
 });
 
 app.get("/api/hunter", async (req, res) => {
