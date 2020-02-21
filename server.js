@@ -1,7 +1,7 @@
 const express = require("express");
 var bodyParser = require("body-parser");
 const app = express();
-const hbs = require("hbs");
+const hbs = require("express-hbs");
 require("./hbs/helpers/helpers");
 const ogameApi = require("./ogameApi.js");
 const mongoose = require("mongoose");
@@ -10,14 +10,24 @@ const hunter = require("./Scripts/hunter.js");
 const { timeout } = require("./utils/utils.js");
 const Player = require("./models/Players");
 const { PendingXHR } = require("pending-xhr-puppeteer");
+const formatISO9075 = require("date-fns/formatISO9075");
+const getMonth = require("date-fns/getMonth");
+const getDate = require("date-fns/getDate");
+const getHours = require("date-fns/getHours");
+const _ = require("underscore");
 
 const port = process.env.PORT || 5000;
 
 app.use(express.static(__dirname + "/public"));
 //Express HBS engine
+app.engine(
+  "hbs",
+  hbs.express4({
+    partialsDir: __dirname + "/views/partials"
+  })
+);
 app.set("view engine", "hbs");
-hbs.registerPartials(__dirname + "/views/partials");
-
+app.set("views", __dirname + "/views");
 // parse application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: false }));
 
@@ -66,7 +76,9 @@ let playersToHunt = [];
   let playersFromDB = await Player.find();
   playersFromDB.forEach(player => {
     console.log("inicializando los jugadores");
-    playersToHunt.push(player.nickname);
+    if (player.hunt) {
+      playersToHunt.push(player.nickname);
+    }
   });
   playersFromDB = null;
   console.log("players to hunt es: ", playersToHunt);
@@ -95,8 +107,60 @@ app.get("/hunter", async (req, res) => {
 });
 
 app.get("/graficas", async (req, res) => {
-  let playersToHunt = await Player.find();
-  res.render("graphics", { playersToHunt });
+  let playersToHunt = await Player.findOne({ nickname: "cosaco" });
+  let planets = playersToHunt.planets;
+  var x = 60; //minutes interval
+  var times = []; // time array
+  var tt = 0; // start time
+  var ap = ["AM", "PM"]; // AM-PM
+
+  //loop to increment the time and push results in array
+  for (var i = 0; tt < 24 * 60; i++) {
+    var hh = Math.floor(tt / 60); // getting hours of day in 0-24 format
+    var mm = tt % 60; // getting minutes of the hour in 0-55 format
+    times[i] =
+      ("0" + (hh % 12)).slice(-2) +
+      ":" +
+      ("0" + mm).slice(-2) +
+      ap[Math.floor(hh / 12)]; // pushing data in array in [00:00 - 12:00 AM/PM format]
+    tt = tt + x;
+  }
+
+  let dates = [];
+  for (const planet of planets) {
+    let group = _.groupBy(planet.activities, date => {
+      return getDate(date.date);
+    });
+    dates.push(group);
+    // planet.activities.forEach(activity => {
+    //   console.log(
+    //     planet.name +
+    //       " : " +
+    //       activity.lastActivity +
+    //       " : " +
+    //       formatISO9075(activity.date)
+    //   );
+    // });
+  }
+  for (const date of dates) {
+    for (const day in date) {
+      if (date.hasOwnProperty(day)) {
+        let intervals = {};
+        let hours = _.groupBy(date[day], hour => getHours(hour.date));
+        intervals = hours;
+        date[day] = intervals;
+      }
+    }
+  }
+  // console.log(JSON.stringify(dates));
+
+  // dates.forEach(date => {
+  console.log(dates[0]["20"]["1"]);
+  // });
+  dates[0]["20"]["13"].forEach(date => {
+    console.log(formatISO9075(date.date));
+  });
+  res.render("graphics", { playersToHunt, planets, times, dates });
 });
 
 app.get("/api/hunter", async (req, res) => {
@@ -114,8 +178,10 @@ app.post("/api/players", async (req, res) => {
       id: playerInfo.id,
       nickname: playerInfo.nickname,
       planets: playerInfo.planets,
-      notes: ""
+      notes: "",
+      hunt: true
     });
+    console.log("agregando a este jugador: ", player);
     playerInfo = await player.save();
     console.log("agregando a lista de hunteados...");
     playersToHunt.push(playerInfo.nickname);
@@ -175,30 +241,6 @@ app.get("/api/players", async (req, res) => {
   }
 });
 
-app.post("/api/players", async (req, res) => {
-  let playerInfo = await ogameApi.getPlayerInfo("Emperor Fidis");
-  console.log("la informacion del jugador es: ", playerInfo);
-  body = req.body;
-  let player = new Player({
-    id: playerInfo.id,
-    nickname: playerInfo.nickname,
-    planets: playerInfo.planets,
-    notes: ""
-  });
-  player.save((err, playerDB) => {
-    if (err) {
-      return res.status(400).json({
-        ok: false,
-        err
-      });
-    }
-    res.json({
-      ok: true,
-      playerDB
-    });
-  });
-});
-
 app.post("/api/hunter", (req, res) => {
   console.log("recibi estos datos: ", req.body.playerName);
   let playerToHunt = req.body.playerName;
@@ -212,35 +254,34 @@ app.get("/api/scan", async (req, res) => {
   let playerInfo = await Player.findOne({ nickname });
   if (!playerInfo) {
     playerInfo = await ogameApi.getPlayerInfo(nickname);
-    // let player = new Player({
-    //   id: playerApi.id,
-    //   nickname: playerApi.nickname,
-    //   planets: playerApi.planets,
-    //   notes: ""
-    // });
-    // playerInfo = await player.save();
   }
   if (playerInfo) {
-    var page = await bot.createNewPage();
-    const pendingXHR = new PendingXHR(page);
-    for (const planet of playerInfo.planets) {
-      planet.activities = [];
-      if (planet.active) {
-        let activity = await bot.checkPlanetActivity(
-          planet.coords,
-          planet.planetType,
-          playerInfo.nickname,
-          page,
-          pendingXHR
-        );
-        if (!activity) {
-          planet.active = false;
-          // await playerInfo.save();
-        } else planet.activities.push(activity);
+    try {
+      var page = await bot.createNewPage();
+      const pendingXHR = new PendingXHR(page);
+      for (const planet of playerInfo.planets) {
+        planet.activities = [];
+        if (planet.active) {
+          let activity = await bot.checkPlanetActivity(
+            planet.coords,
+            planet.planetType,
+            playerInfo.nickname,
+            page,
+            pendingXHR
+          );
+          if (!activity) {
+            planet.active = false;
+            // await playerInfo.save();
+          } else planet.activities.push(activity);
+        }
       }
+      await page.close();
+      res.json({ ok: true, playerInfo });
+    } catch (error) {
+      console.log("se dio un error en scan..probablemente el logeo");
+      console.log("el error es: ", error);
+      await bot.checkLoginStatus(page);
     }
-    await page.close();
-    res.json({ ok: true, playerInfo });
   } else {
     res.json({ ok: true, playerInfo: {} });
   }

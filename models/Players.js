@@ -9,6 +9,10 @@ let playersSchema = new Schema({
     type: String,
     required: [true, "el nick del jugador es necesario!"]
   },
+  hunt: {
+    type: Boolean,
+    default: false
+  },
   planets: [
     {
       id: String,

@@ -1,21 +1,31 @@
-<canvas id="myChart" width="400" height="400"></canvas>
-<script>
-    var chart = new Chart(ctx, {
-        // The type of chart we want to create
-        type: 'line',
+{{> head }}
 
-        // The data for our dataset
-        data: {
-            labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
-            datasets: [{
-                label: 'My First dataset',
-                backgroundColor: 'rgb(255, 99, 132)',
-                borderColor: 'rgb(255, 99, 132)',
-                data: [0, 10, 5, 2, 20, 30, 45]
-            }]
-        },
 
-        // Configuration options go here
-        options: {}
-    });
-</script>
+{{> navbar }}
+{{dates.0.20.13}}
+<div class="ml-5 mt-5">
+    <table class="table">
+        <thead class="thead-dark">
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Planeta</th>
+                <th scope="col">Coordenada</th>
+                {{#each times}}
+                <th scope="col">{{this}}</th>
+                {{/each}}
+            </tr>
+        </thead>
+        <tbody>
+            {{#each playersToHunt.[planets]}}
+            <tr>
+                <th scope="row">{{@index}}</th>
+                <td>{{name}}</td>
+                <td>{{coords}}</td>
+                {{!-- {{#each ../dates.[@index].[20].[13]}}
+                <td>gaea</td>
+                {{/each}} --}}
+            </tr>
+            {{/each}}
+        </tbody>
+    </table>
+</div>
