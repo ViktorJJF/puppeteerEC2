@@ -422,7 +422,7 @@ module.exports = class Bot {
     planetType == "planet"
       ? console.log(player, "Empezando a escanear planeta: ", coords)
       : console.log(player, "Empezando a escanear luna: ", coords);
-    // await timeout(3000);
+    await timeout(500);
     let planetExist;
     if (planetType == "planet") {
       planetExist = await page.$(
@@ -433,7 +433,10 @@ module.exports = class Bot {
     }
     if (!planetExist) {
       console.log("el planeta no existe");
-      return false;
+      return {
+        date: new Date(),
+        lastActivity: null
+      };
     }
     // if (planetType == "planet")
     //   await page
