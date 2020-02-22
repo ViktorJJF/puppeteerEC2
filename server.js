@@ -85,7 +85,7 @@ let playersToHunt = [];
     for (const playerToHunt of playersToHunt) {
       await hunter(playerToHunt, bot);
     }
-    await timeout(15 * 60 * 1000);
+    await timeout(10 * 60 * 1000);
   }
 })();
 
@@ -106,8 +106,9 @@ app.get("/hunter", async (req, res) => {
 });
 
 app.get("/graficas", async (req, res) => {
-  let playerToHunt = await Player.findOne({ nickname: "emperor fidis" });
-  console.log("su info es: ", playerToHunt);
+  let nickname = "Malvad0";
+  let playerToHunt = await Player.findOne({ nickname: nickname.toLowerCase() });
+  // console.log("su info es: ", playerToHunt);
   let planets = playerToHunt.planets;
   var x = 60; //minutes interval
   var times = []; // time array
