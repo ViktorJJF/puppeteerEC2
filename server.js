@@ -106,7 +106,8 @@ app.get("/hunter", async (req, res) => {
 });
 
 app.get("/graficas", async (req, res) => {
-  let playerToHunt = await Player.findOne({ nickname: "en venta" });
+  let playerToHunt = await Player.findOne({ nickname: "emperor fidis" });
+  console.log("su info es: ", playerToHunt);
   let planets = playerToHunt.planets;
   var x = 60; //minutes interval
   var times = []; // time array

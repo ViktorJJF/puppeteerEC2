@@ -24,6 +24,7 @@ hbs.registerHelper("capitalizar", texto => {
 
 hbs.registerHelper("getHours", (dates, day) => {
   console.log("el dia: ", day);
+  console.log("se retornara: ", dates[day]);
   return dates[day];
 });
 

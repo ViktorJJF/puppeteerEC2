@@ -33,7 +33,7 @@
                     {{/each}}</td> --}}
                 <td>{{#each this}} <p> <span
                             class="ogameActivity {{#if_eq this.lastActivity 'on'}}onState{{else}}{{#if_eq this.lastActivity 'off'}}offState{{else}}minuteState{{/if_eq}}{{/if_eq}}">
-                            {{this.lastActivity}}</span>
+                            {{formatIso this.date}} {{this.lastActivity}}</span>
                     </p>
                     {{/each}}</td>
                 {{/each}}
