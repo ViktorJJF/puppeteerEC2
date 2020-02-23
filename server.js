@@ -83,7 +83,7 @@ let playersToHunt = [];
   console.log("players to hunt es: ", playersToHunt);
   while (1 == 1) {
     for (const playerToHunt of playersToHunt) {
-      await hunter(playerToHunt, bot);
+      // await hunter(playerToHunt, bot);
     }
     await timeout(10 * 60 * 1000);
   }
@@ -106,7 +106,9 @@ app.get("/hunter", async (req, res) => {
 });
 
 app.get("/graficas", async (req, res) => {
-  let nickname = "Al Sa-her";
+  let nickname = req.query.nickname || "cosaco";
+  let detailed = req.query.detailed ? req.query.detailed == "true" : false;
+  console.log("detallado es: ", detailed);
   let playerToHunt = await Player.findOne({ nickname: nickname.toLowerCase() });
   // console.log("su info es: ", playerToHunt);
   let planets = playerToHunt.planets;
@@ -168,14 +170,28 @@ app.get("/graficas", async (req, res) => {
   //   console.log("planeta :", i, planet.dates);
   // });
   let totalDays = Object.keys(dates[0]).length;
-  console.log("el total es: ", totalDays);
-  res.render("graphics", { playerToHunt, planets, times, dates, totalDays });
+  // console.log("el total es: ", totalDays);
+  console.log("players to hunt es: ", playersToHunt);
+  res.render("graphics", {
+    playersToHunt,
+    playerToHunt,
+    planets,
+    times,
+    dates,
+    totalDays,
+    detailed
+  });
 });
 
 app.get("/api/hunter", async (req, res) => {
   let playerInfo = await ogameApi.getPlayerInfo("Emperor Fidis");
   res.json({ ok: true, playerInfo });
 });
+// app.get("/api/graphics", async (req, res) => {
+//   let nickname=req.query.nickname;
+//   let detailed=req.query.detailed;
+//   res.json({ ok: true, playerInfo });
+// });
 
 app.post("/api/players", async (req, res) => {
   let body = req.body;

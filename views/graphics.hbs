@@ -4,6 +4,16 @@
 {{> navbar }}
 {{!-- {{dates.0.20.13}} --}}
 <div class="ml-5 mt-5">
+    {{!-- <form action="/api/graphics" method="POST"></form>
+    <div class="form-group">
+        <label for="playerNameInput">Nombre del jugador</label>
+        <select name="nickname" class="custom-select" id="playerNameInput">
+            {{#each playersToHunt}}
+            <option value="{{this}}">{{this}}</option>
+            {{/each}}
+        </select>
+    </div>
+    </form> --}}
     <h1>Actividades de: {{playerToHunt.nickname}} - {{k}}</h1>
     {{#each playerToHunt.[planets].[0].[dates] as |date k|}}
     <h3>Fecha: {{getDateByDay k}}</h3>
@@ -33,7 +43,7 @@
                     {{/each}}</td> --}}
                 <td>{{#each this}} <p> <span
                             class="ogameActivity {{#if_eq this.lastActivity 'on'}}onState{{else}}{{#if_eq this.lastActivity 'off'}}offState{{else}}minuteState{{/if_eq}}{{/if_eq}}">
-                            {{formatIso this.date}} {{this.lastActivity}}</span>
+                            {{#if ../../../../detailed}}{{formatIso this.date}}{{/if}}{{this.lastActivity}}</span>
                     </p>
                     {{/each}}</td>
                 {{/each}}
