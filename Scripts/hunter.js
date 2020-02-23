@@ -26,19 +26,19 @@ async function beginHunter(nickname, bot) {
     const pendingXHR = new PendingXHR(page);
     console.log("empezando hunter para...", playerInfo.nickname);
     for (const planet of playerInfo.planets) {
-      if (planet.active) {
-        let activity = await bot.checkPlanetActivity(
-          planet.coords,
-          planet.planetType,
-          playerInfo.nickname,
-          page,
-          pendingXHR
-        );
-        if (!activity) {
-          planet.active = false;
-          await playerInfo.save();
-        } else planet.activities.push(activity);
-      }
+      // if (planet.active) {
+      let activity = await bot.checkPlanetActivity(
+        planet.coords,
+        planet.planetType,
+        playerInfo.nickname,
+        page,
+        pendingXHR
+      );
+      if (!activity) {
+        planet.active = false;
+        await playerInfo.save();
+      } else planet.activities.push(activity);
+      // }
     }
     await playerInfo.save();
     playerInfo = null;

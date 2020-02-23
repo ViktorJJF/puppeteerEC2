@@ -106,7 +106,7 @@ app.get("/hunter", async (req, res) => {
 });
 
 app.get("/graficas", async (req, res) => {
-  let nickname = "en venta";
+  let nickname = "Al Sa-her";
   let playerToHunt = await Player.findOne({ nickname: nickname.toLowerCase() });
   // console.log("su info es: ", playerToHunt);
   let planets = playerToHunt.planets;
