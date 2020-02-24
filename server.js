@@ -83,7 +83,7 @@ let playersToHunt = [];
   console.log("players to hunt es: ", playersToHunt);
   while (1 == 1) {
     for (const playerToHunt of playersToHunt) {
-      // await hunter(playerToHunt, bot);
+      await hunter(playerToHunt, bot);
     }
     await timeout(10 * 60 * 1000);
   }
@@ -294,10 +294,7 @@ app.get("/api/scan", async (req, res) => {
             page,
             pendingXHR
           );
-          if (!activity) {
-            planet.active = false;
-            // await playerInfo.save();
-          } else planet.activities.push(activity);
+          planet.activities.push(activity);
         }
       }
       await page.close();
