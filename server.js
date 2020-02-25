@@ -16,6 +16,7 @@ const formatISO9075 = require("date-fns/formatISO9075");
 const getMonth = require("date-fns/getMonth");
 const getDate = require("date-fns/getDate");
 const getHours = require("date-fns/getHours");
+const { format, utcToZonedTime } = require("date-fns-tz");
 const _ = require("underscore");
 
 const port = process.env.PORT || 5000;
@@ -166,7 +167,9 @@ app.get("/graficas", async (req, res) => {
     //   console.log(getDate(date.date));
     // });
     let group = _.groupBy(planet.activities, date => {
-      return getDate(date.date);
+      const parisTimeZone = "America/Lima";
+      let localeDate = utcToZonedTime(date.date, parisTimeZone);
+      return getDate(localeDate);
     });
     // planet.activities = planet.activities.reverse();
     dates.push(group);
