@@ -1,0 +1,93 @@
+{{> head }}
+
+
+{{> navbar }}
+<div class="container mt-3">
+    <form action="/universo" method="POST">
+        <div class="form-group">
+            <label for="playerNameInput"><b># de Galaxia</b></label>
+            <div class="row">
+                <div class="col-sm-8">
+                    <select name="galaxy" class="custom-select" id="playerNameInput" onchange="this.form.submit()">
+                        {{#each galaxiesIndex}}
+                        <option value="{{this}}" {{#if_eq this ../galaxyNumber}}selected{{/if_eq}}>Galaxia {{this}}
+                        </option>
+                        {{/each}}
+                    </select>
+                </div>
+                <div class="col-sm-4">
+                    <div class="custom-control custom-checkbox mr-sm-2">
+                        <input onchange="this.form.submit()" name="showRanking" type="checkbox"
+                            class="custom-control-input" id="customControlAutosizing"
+                            {{#if_eq showRanking 'true'}}checked{{/if_eq}}>
+                        <label class="custom-control-label" for="customControlAutosizing">Ver ranking</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+    <h2 class="mb-2">Distribución de galaxia {{galaxyNumber}} - al día 24/02/20</h2>
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th scope="col">#</th>
+
+                {{#each planetsIndex}}<th scope="col">{{this}}</th>{{/each}}
+
+            </tr>
+        </thead>
+        <tbody>
+            {{#each galaxy as |solarSystem i|}}
+            <tr>
+                <th scope="row">[{{../galaxyNumber}}:{{index i}}:x]</th>
+                {{#each solarSystem}}
+                {{#if (planetExist this)}}
+                {{#if this.honor}}
+                <td class="yellowPlayer">
+                    {{#if_eq this.state 'bandit'}}
+                    <span class="honorRank rank_bandit3"></span>
+                    {{/if_eq}}
+                    {{#if this.moon}}
+                    <span class="moon_a"></span>
+                    {{/if}}
+                    {{#if_eq ../../showRanking 'true'}}
+                    <div class="mt-4">{{this.rank}}</div>
+                    {{/if_eq}}
+                </td>
+                {{else}}
+                {{#if_eq this.playerName ""}}
+                <td class="red"></td>
+                {{else}}
+                <td class="{{this.state}}">
+                    {{#if_eq this.state 'bandit'}}
+                    <span class="honorRank rank_bandit3"></span>
+                    {{/if_eq}}
+                    {{#if this.moon}}
+                    <span class="moon_a"></span>
+                    {{/if}}
+                    {{#if_eq ../../showRanking 'true'}}
+                    <div class="mt-4">{{this.rank}}</div>
+                    {{/if_eq}}
+                </td>
+                {{/if_eq}}
+
+                {{!-- {{#if_eq this.state 'green'}}
+                <td>
+                    <div class="greenPlayer"></div>
+                </td>
+                {{else}}
+                <td>
+                    <div class="whitePlayer"></div>
+                </td>
+                {{/if_eq}} --}}
+
+                {{/if}}
+                {{else}}
+                <td></td>
+                {{/if}}
+                {{/each}}
+            </tr>
+            {{/each}}
+        </tbody>
+    </table>
+</div>

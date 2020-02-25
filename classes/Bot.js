@@ -53,7 +53,7 @@ module.exports = class Bot {
     console.log("iniciando bot...");
     if (environment === "dev") {
       const pathToExtension =
-        "C:\\Users\\JIMENEZ\\AppData\\Local\\Google\\Chrome\\User Data\\Default\\Extensions\\mjnbclmflcpookeapghfhapeffmpodij\\1.5.4_0";
+        "C:\\Users\\JIMENEZ\\AppData\\Local\\Google\\Chrome\\User Data\\Default\\Extensions\\ipmfkhoihjbbohnfecpmhekhippaplnh\\4.1.1_0";
       this.browser = await puppeteer.launch({
         headless: false,
         args: [
@@ -488,60 +488,82 @@ module.exports = class Bot {
     return planetActivity;
   }
 
-  async solarSystemScraping(coords) {
+  async solarSystemScraping(coords, page, pendingXHR) {
     console.log("Empezando a escanear sistema solar: ", coords);
-    await this.goToSolarSystem(coords);
-    // await timeout(5000);
-    console.log("esperando respuesta del sistema solar...");
-    try {
-      await this.page.waitForResponse(response => {
-        return (
-          response.url() ===
-            "https://s167-es.ogame.gameforge.com/game/index.php?page=ingame&component=overview&relogin=1" &&
-          response.status() === 200
-        );
-      });
-      await timeout(500);
-    } catch (error) {
-      console.log(error);
-    }
+    var page = page || this.page;
+    await this.goToSolarSystem(coords, page);
+    await pendingXHR.waitForAllXhrFinished();
     console.log("empezando scraping");
-    var self = this;
-    let ssData = await self.page.evaluate(() => {
-      let planets = [];
-      // get the hotel elements
-      let planetsElms = document.querySelectorAll("tr.row");
-      // get the planet data
-      planetsElms.forEach(async (planet, position) => {
-        let planetJson = {};
-        try {
-          planetJson.position = position + 1;
-          planetJson.name = planet.querySelector("td.planetname").innerText;
-          planetJson.playerName = planet.querySelector(
-            ".status_abbr_strong"
-          ).innerText;
-          //check activity
-          var checkSelector = planet.querySelector(
-            "td.microplanet>.ListImage>.activity"
-          );
-          var checkActivityMinutes = planet.querySelector(
-            "td.microplanet>.ListImage>.activity.showMinutes"
-          );
-          if (!checkSelector) planetJson.lastActivity = "off";
-          else if (checkActivityMinutes) {
-            planetJson.lastActivity = checkActivityMinutes.innerText;
-          } else {
-            planetJson.lastActivity = "on";
-          }
-        } catch (exception) {
-          console.log("hubo un error con el scraping de ss");
-          console.log(exception);
-        }
-        planets.push(planetJson);
-      });
-      return planets;
-    });
-    console.log("los datos son: ", ssData);
+    let planets = [];
+    let planetsSelector = await page.$$("tr.row");
+    let position = 1;
+    for (const planet of planetsSelector) {
+      let planetJson = {};
+      planetJson.position = position;
+      let planetExist = await planet.$("a>span");
+      if (planetExist) {
+        // await planetExist.hover();
+        // // await timeout(1000);
+        // let militaryInfo = await page.evaluate(() => {
+        //   let points = document.querySelector(
+        //     ".tpd-content-wrapper[style='visibility: visible;'] .uv-player-highscore>ul>li:nth-child(2)"
+        //   );
+        //   let shipsQty = document.querySelector(
+        //     ".tpd-content-wrapper[style='visibility: visible;'] .uv-player-highscore>ul>li:nth-child(3)"
+        //   );
+        //   return {
+        //     points: points ? points.innerText : 0,
+        //     shipsQty: shipsQty ? shipsQty.innerText : 0
+        //   };
+        // });
+        planetJson.name = await planet.evaluate(
+          e => e.querySelector("td.planetname").innerText
+        );
+        planetJson.playerName = await planet.evaluate(
+          e => e.querySelector("td.playername>a>span").innerText
+        );
+        planetJson.rank = await planet.evaluate(e =>
+          e.querySelector(".uv-galaxy-rank")
+            ? e.querySelector(".uv-galaxy-rank").innerText
+            : 0
+        );
+        planetJson.honor = (await planet.evaluate(e =>
+          e.querySelector(".status_abbr_honorableTarget")
+        ))
+          ? true
+          : false;
+        planetJson.state = await planet.evaluate(e => {
+          let bandit1 = e.querySelector(".honorRank.rank_bandit1");
+          let bandit2 = e.querySelector(".honorRank.rank_bandit2");
+          let bandit3 = e.querySelector(".honorRank.rank_bandit3");
+          let bandit = bandit1 || bandit2 || bandit3;
+          let inactive = e.querySelector(".status_abbr_inactive");
+          let green = e.querySelector(".status_abbr_noob");
+          let vacation = e.querySelector(".status_abbr_vacation");
+          return vacation
+            ? "vacation"
+            : inactive
+            ? "inactive"
+            : green
+            ? "green"
+            : bandit
+            ? "bandit"
+            : "normal";
+        });
+        // planetJson.militaryInfo = militaryInfo;
+        planetJson.moon = (await planet.evaluate(e =>
+          e.querySelector(".moon.js_no_action")
+        ))
+          ? false
+          : true;
+        planetJson.coords = await planet.evaluate(e =>
+          e.querySelector("td").getAttribute("data-coords")
+        );
+      }
+      position++;
+      planets.push(planetJson);
+    }
+    return planets;
   }
 
   async closeAds(page) {

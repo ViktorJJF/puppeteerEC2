@@ -1,5 +1,6 @@
 const hbs = require("express-hbs");
 const formatISO9075 = require("date-fns/formatISO9075");
+const { format, utcToZonedTime } = require("date-fns-tz");
 const getMonth = require("date-fns/getMonth");
 
 hbs.registerHelper("getAnio", () => {
@@ -29,7 +30,11 @@ hbs.registerHelper("getHours", (dates, day) => {
 });
 
 hbs.registerHelper("formatIso", date => {
-  return formatISO9075(date, { representation: "time" });
+  const parisTimeZone = "America/Lima";
+  var date = utcToZonedTime(date, parisTimeZone);
+  return format(date, "HH:mm:ss", {
+    timeZone: parisTimeZone
+  });
 });
 
 hbs.registerHelper("if_eq", function(a, b, opts) {
@@ -53,4 +58,26 @@ hbs.registerHelper("index", i => {
 hbs.registerHelper("complement", (totalDays, i) => {
   console.log("se enviara: ", totalDays, i, totalDays - i);
   return totalDays - i;
+});
+
+hbs.registerHelper("planetExist", planet => {
+  return planet.hasOwnProperty("playerName");
+});
+
+hbs.registerHelper("state", state => {
+  switch (state) {
+    case "vacation":
+      break;
+    case "inactive":
+      break;
+    case "green":
+      break;
+    case "bandit":
+      break;
+    case "normal":
+      break;
+
+    default:
+      break;
+  }
 });

@@ -7,8 +7,10 @@ const ogameApi = require("./ogameApi.js");
 const mongoose = require("mongoose");
 const Bot = require("./classes/Bot");
 const hunter = require("./Scripts/hunter.js");
+const scanGalaxy = require("./Scripts/scanGalaxy.js");
 const { timeout } = require("./utils/utils.js");
 const Player = require("./models/Players");
+const Galaxy = require("./models/Galaxies");
 const { PendingXHR } = require("pending-xhr-puppeteer");
 const formatISO9075 = require("date-fns/formatISO9075");
 const getMonth = require("date-fns/getMonth");
@@ -53,8 +55,8 @@ let playersToHunt = [];
 (async () => {
   await bot.begin("prod");
   await bot.login("jimenezflorestacna@gmail.com", "sed4cfv52309@");
-  // await bot.login("rodrigo.diazranilla@gmail.com", "phoneypeople");
-  //first execution
+  // await bot.login("vj.jimenez96@gmail.com", "sed4cfv52309@");
+  // first execution
   // let playersToHunt = [
   //   "Edipo",
   //   "Peacemaker",
@@ -85,13 +87,17 @@ let playersToHunt = [];
     for (const playerToHunt of playersToHunt) {
       await hunter(playerToHunt, bot);
     }
-    await timeout(10 * 60 * 1000);
+    await timeout(13 * 60 * 1000);
   }
+  // for (let i = 1; i <= 6; i++) {
+  //   await scanGalaxy(String(i), bot);
+  //   await timeout(5 * 1000);
+  // }
 })();
 
 app.get("/", (req, res) => {
   res.render("home", {
-    nombre: "Victor Juan Jimenez Flores!",
+    nombre: "PepeHunter",
     anio: new Date().getFullYear()
   });
 });
@@ -105,10 +111,35 @@ app.get("/hunter", async (req, res) => {
   res.render("hunter", { playersToHunt });
 });
 
+app.get("/universo", async (req, res) => {
+  let galaxyNumber = req.query.galaxia || 1;
+  let showRanking = req.query.ranking;
+  let galaxy = await Galaxy.findOne({ number: galaxyNumber });
+  // console.log("el sistema solar: ", galaxy);
+  let planetsIndex = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15];
+  let galaxiesIndex = [1, 2, 3, 4, 5, 6];
+  res.render("universe", {
+    galaxy: galaxy.solarSystem,
+    planetsIndex,
+    galaxiesIndex,
+    showRanking,
+    galaxyNumber
+  });
+});
+
+app.post("/universo", async (req, res) => {
+  let galaxy = req.body.galaxy;
+  let showRanking = req.body.showRanking == "on" ? true : false;
+  console.log("showranking es: ", showRanking);
+  res.redirect(`/universo?galaxia=${galaxy}&&ranking=${showRanking}`);
+});
+
 app.get("/graficas", async (req, res) => {
+  let players = await Player.find()
+    .select("nickname -_id")
+    .exec();
   let nickname = req.query.nickname || "cosaco";
-  let detailed = req.query.detailed ? req.query.detailed == "true" : false;
-  console.log("detallado es: ", detailed);
+  let showDetails = req.query.detailed ? req.query.detailed == "true" : false;
   let playerToHunt = await Player.findOne({ nickname: nickname.toLowerCase() });
   // console.log("su info es: ", playerToHunt);
   let planets = playerToHunt.planets;
@@ -131,34 +162,34 @@ app.get("/graficas", async (req, res) => {
 
   let dates = [];
   for (const planet of planets) {
+    // planetActivities.forEach(date => {
+    //   console.log(getDate(date.date));
+    // });
     let group = _.groupBy(planet.activities, date => {
       return getDate(date.date);
     });
+    // planet.activities = planet.activities.reverse();
     dates.push(group);
-    // planet.activities.forEach(activity => {
-    //   console.log(
-    //     planet.name +
-    //       " : " +
-    //       activity.lastActivity +
-    //       " : " +
-    //       formatISO9075(activity.date)
-    //   );
-    // });
   }
   for (const date of dates) {
     for (const day in date) {
       if (date.hasOwnProperty(day)) {
-        let intervals = {};
-        let hours = _.groupBy(date[day], hour => getHours(hour.date));
-        intervals = hours;
-        date[day] = intervals;
+        // date[day] = [];
+        let intervals = [];
+        let hours = _.groupBy(date[day], hour => {
+          return getHours(hour.date);
+        });
+        times.forEach((hourInterval, idx) => {
+          if (!hours[String(idx)]) hours[String(idx)] = [];
+        });
+        date[day] = hours;
       }
     }
   }
   // console.log(JSON.stringify(dates));
 
   // dates.forEach(date => {
-  // console.log(dates[0]["20"]["1"]);
+  // console.log(dates[0]["21"]);
   // // });
   // dates[0]["20"]["13"].forEach(date => {
   //   console.log(formatISO9075(date.date));
@@ -170,17 +201,21 @@ app.get("/graficas", async (req, res) => {
   //   console.log("planeta :", i, planet.dates);
   // });
   let totalDays = Object.keys(dates[0]).length;
-  // console.log("el total es: ", totalDays);
-  console.log("players to hunt es: ", playersToHunt);
   res.render("graphics", {
-    playersToHunt,
+    players,
     playerToHunt,
     planets,
     times,
     dates,
     totalDays,
-    detailed
+    showDetails
   });
+});
+
+app.post("/graficas", (req, res) => {
+  let nickname = req.body.nickname;
+  let showDetails = req.body.showDetails == "on" ? "true" : false;
+  res.redirect(`/graficas?nickname=${nickname}&&detailed=${showDetails}`);
 });
 
 app.get("/api/hunter", async (req, res) => {

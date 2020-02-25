@@ -4,19 +4,34 @@
 {{> navbar }}
 {{!-- {{dates.0.20.13}} --}}
 <div class="ml-5 mt-5">
-    {{!-- <form action="/api/graphics" method="POST"></form>
-    <div class="form-group">
-        <label for="playerNameInput">Nombre del jugador</label>
-        <select name="nickname" class="custom-select" id="playerNameInput">
-            {{#each playersToHunt}}
-            <option value="{{this}}">{{this}}</option>
-            {{/each}}
-        </select>
-    </div>
-    </form> --}}
-    <h1>Actividades de: {{playerToHunt.nickname}} - {{k}}</h1>
+    <form action="/graficas" method="POST">
+        <div class="form-group">
+            <label for="playerNameInput"><b>Nickname del jugador</b></label>
+            <div class="row">
+                <div class="col-sm-8">
+                    <select name="nickname" class="custom-select" id="playerNameInput" onchange="this.form.submit()">
+                        {{#each players}}
+                        <option value="{{this.nickname}}"
+                            {{#if_eq this.nickname ../playerToHunt.nickname}}selected{{/if_eq}}>
+                            {{this.nickname}}
+                        </option>
+                        {{/each}}
+                    </select>
+                </div>
+                <div class="col-sm-4">
+                    <div class="custom-control custom-checkbox mr-sm-2">
+                        <input onchange="this.form.submit()" name="showDetails" type="checkbox"
+                            class="custom-control-input" id="customControlAutosizing" {{#if showDetails}}checked{{/if}}>
+                        <label class="custom-control-label" for="customControlAutosizing">Ver Gráficas
+                            detalladas</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+    <h3>Resumen de actividades de: <i>{{playerToHunt.nickname}}</i></h3>
     {{#each playerToHunt.[planets].[0].[dates] as |date k|}}
-    <h3>Fecha: {{getDateByDay k}}</h3>
+    <h4>Fecha: {{getDateByDay k}}</h4>
     <table class="table table-bordered">
         <thead class="thead-dark">
             <tr>
@@ -34,7 +49,7 @@
             <tr class="{{#if_eq player.planetType 'moon'}}moon{{/if_eq}}">
                 <th scope="row">{{index i}}</th>
                 <td class="font-weight-bold">{{player.name}}</td>
-                <td class="font-weight-bold">{{player.coords}}</td>
+                <td class="font-weight-bold">[{{player.coords}}]</td>
                 <td class="font-weight-bold">{{#if_eq player.planetType 'moon'}}Luna{{else}}{{#if_eq i '0'}}Planeta
                     Principal{{else}}Planeta{{/if_eq}}{{/if_eq}}</td>
                 {{#each (getHours player.dates k)}}
@@ -43,7 +58,7 @@
                     {{/each}}</td> --}}
                 <td>{{#each this}} <p> <span
                             class="ogameActivity {{#if_eq this.lastActivity 'on'}}onState{{else}}{{#if_eq this.lastActivity 'off'}}offState{{else}}minuteState{{/if_eq}}{{/if_eq}}">
-                            {{#if ../../../../detailed}}{{formatIso this.date}}&nbsp;{{/if}}{{this.lastActivity}}</span>
+                            {{#if ../../../../showDetails}}{{formatIso this.date}}&nbsp;{{/if}}{{this.lastActivity}}</span>
                     </p>
                     {{/each}}</td>
                 {{/each}}
