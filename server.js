@@ -76,9 +76,9 @@ let playersToHunt = [];
   //   "EN VENTA",
   //   "Renegade Ferret"
   // ];
-  let playersFromDB = await Player.find();
+  let playersFromDB = await Player.find({}, ["nickname", "hunt"]);
+  console.log("players from db es:", playersFromDB);
   playersFromDB.forEach(player => {
-    console.log("inicializando los jugadores");
     if (player.hunt) {
       playersToHunt.push(player.nickname);
     }
