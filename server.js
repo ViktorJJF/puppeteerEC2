@@ -91,7 +91,7 @@ let playersToHunt = [];
     }
     await timeout(13 * 60 * 1000);
   }
-  // for (let i = 1; i <= 6; i++) {
+  // for (let i = 3; i <= 6; i++) {
   //   await scanGalaxy(String(i), bot);
   //   await timeout(5 * 1000);
   // }
@@ -109,7 +109,10 @@ app.get("/about", (req, res) => {
 });
 
 app.get("/hunter", async (req, res) => {
-  let playersToHunt = await Player.find();
+  let playersToHunt = await Player.find()
+    .select("-planets")
+    .exec();
+  console.log("players: ", playersToHunt);
   res.render("hunter", { playersToHunt });
 });
 
@@ -117,6 +120,7 @@ app.get("/universo", async (req, res) => {
   let galaxyNumber = req.query.galaxia || 1;
   let showRanking = req.query.ranking;
   let galaxy = await Galaxy.findOne({ number: galaxyNumber });
+  let date = formatISO9075(galaxy.createdAt);
   // console.log("el sistema solar: ", galaxy);
   let planetsIndex = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15];
   let galaxiesIndex = [1, 2, 3, 4, 5, 6];
@@ -125,7 +129,8 @@ app.get("/universo", async (req, res) => {
     planetsIndex,
     galaxiesIndex,
     showRanking,
-    galaxyNumber
+    galaxyNumber,
+    date
   });
 });
 

@@ -53,7 +53,7 @@ module.exports = class Bot {
     console.log("iniciando bot...");
     if (environment === "dev") {
       const pathToExtension =
-        "C:\\Users\\JIMENEZ\\AppData\\Local\\Google\\Chrome\\User Data\\Default\\Extensions\\ipmfkhoihjbbohnfecpmhekhippaplnh\\4.1.1_0";
+        "C:\\Users\\JIMENEZ\\AppData\\Local\\Google\\Chrome\\User Data\\Default\\Extensions\\ipmfkhoihjbbohnfecpmhekhippaplnh\\4.1.3_0";
       this.browser = await puppeteer.launch({
         headless: false,
         args: [
@@ -559,6 +559,10 @@ module.exports = class Bot {
         planetJson.coords = await planet.evaluate(e =>
           e.querySelector("td").getAttribute("data-coords")
         );
+        planetJson.playerId = await planet.evaluate(e => {
+          let playerId = e.querySelector("td.action a.sendMail");
+          return playerId ? playerId.getAttribute("data-playerid") : 0;
+        });
       }
       position++;
       planets.push(planetJson);
