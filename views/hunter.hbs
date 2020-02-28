@@ -1,68 +1,157 @@
 {{> head }}
 
-
 {{> navbar }}
+{{> modalHunter }}
 <div class="container mt-3 mb-3">
-    <h1>Jugadores a mupear</h1>
-    <ul>
-        {{#each playersToHunt}}
-        <li>
-            {{nickname}}
-        </li>
+  <h2>Listado de hunteados</h2>
+
+  <div class="card">
+    <table class="table">
+      <thead>
+        <tr>
+          <th scope="col">#</th>
+          <th scope="col">Jugador</th>
+          <th scope="col">Hunteando?</th>
+          <th scope="col">Opciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{#each playersToHunt as |playerTohunt i|}}
+        <tr>
+          <th scope="row">{{index i}}</th>
+          <td>{{ nickname }}</td>
+          <td>
+            <form action="/universo" method="POST">
+              <div class="custom-control custom-checkbox mr-sm-2">
+                {{#if hunt}}
+                <input
+                  name="hunt"
+                  type="checkbox"
+                  class="custom-control-input"
+                  id="customControlAutosizing{{ i }}"
+                  checked
+                />
+                <label
+                  class="custom-control-label"
+                  for="customControlAutosizing{{ i }}"
+                  >Sí</label
+                >
+                {{else}}
+                <input
+                  name="hunt"
+                  type="checkbox"
+                  class="custom-control-input"
+                  id="customControlAutosizing{{ i }}"
+                />
+                <label
+                  class="custom-control-label"
+                  for="customControlAutosizing{{ i }}"
+                  >No</label
+                >
+                {{/if}}
+              </div>
+            </form>
+          </td>
+          <td>
+            <!-- Button trigger modal -->
+            <a class="btn btn-primary" href="/hunter/{{ _id }}" role="button"
+              >Editar</a
+            >
+          </td>
+        </tr>
         {{/each}}
-    </ul>
-    <form action="/api/players" method="POST">
-        <div class="container">
-            <div class="row d-flex align-content-center">
-                <div class="col-10">
-                    <div class=" form-group">
-                        <label for="exampleInputEmail1">Nombre del jugador a Controlar</label>
-                        <input name="nickname" type="text" class="form-control" id="exampleInputEmail1"
-                            placeholder="ESCRIBE SU NICK">
-                    </div>
-                </div>
+      </tbody>
+    </table>
+  </div>
 
-                <div class="col-2"><button type="submit" class="btn btn-primary">Agregar Jugador</button>
-                </div>
-            </div>
+  <form action="/api/players" method="POST">
+    <div class="container">
+      <div class="row d-flex align-content-center">
+        <div class="col-10">
+          <div class=" form-group">
+            <label for="exampleInputEmail1"
+              >Nombre del jugador a Controlar</label
+            >
+            <input
+              name="nickname"
+              type="text"
+              class="form-control"
+              id="exampleInputEmail1"
+              placeholder="ESCRIBE SU NICK"
+            />
+          </div>
         </div>
 
-    </form>
-    <h3>Agregar planeta/Luna</h3>
-    <form action="/api/players/planet" method="POST">
-        <div class="form-group">
-            <label for="playerNameInput">Nombre del jugador</label>
-            <select name="nickname" class="custom-select" id="playerNameInput">
-                {{#each playersToHunt}}
-                <option value="{{nickname}}">{{nickname}}</option>
-                {{/each}}
-            </select>
+        <div class="col-2">
+          <button type="submit" class="btn btn-primary">Agregar Jugador</button>
         </div>
-        <div class="form-group">
-            <label for="inputID">ID</label>
-            <input name="id" placeholder="ID del planeta/luna" type="text" class="form-control" id="inputID"
-                aria-describedby="emailHelp">
-        </div>
-        <div class="form-group">
-            <label for="inputName">Nombre</label>
-            <input name="name" placeholder="Nombre del planeta/luna" type="text" class="form-control" id="inputName"
-                aria-describedby="emailHelp">
-        </div>
-        <div class="form-group">
-            <label for="inputCoords">Coordenadas</label>
-            <input name="coords" placeholder="Coordenadas planeta/luna" type="text" class="form-control"
-                id="inputCoords" aria-describedby="emailHelp">
-        </div>
-        <div class="form-group">
-            <label for="inputType">Tipo</label>
-            <select name="planetType" class="form-control" id="inputType">
-                <option value="planet">Planeta</option>
-                <option value="moon">Luna</option>
-            </select>
-        </div>
-        <button type="submit" class="btn btn-primary">Agregar</button>
-    </form>
+      </div>
+    </div>
+  </form>
+  <h3>Agregar planeta/Luna</h3>
+  <form action="/api/players/planet" method="POST">
+    <div class="form-group">
+      <label for="playerNameInput">Nombre del jugador</label>
+      <select name="nickname" class="custom-select" id="playerNameInput">
+        {{#each playersToHunt}}
+        <option value="{{ nickname }}">{{ nickname }}</option>
+        {{/each}}
+      </select>
+    </div>
+    <div class="form-group">
+      <label for="inputID">ID</label>
+      <input
+        name="id"
+        placeholder="ID del planeta/luna"
+        type="text"
+        class="form-control"
+        id="inputID"
+        aria-describedby="emailHelp"
+      />
+    </div>
+    <div class="form-group">
+      <label for="inputName">Nombre</label>
+      <input
+        name="name"
+        placeholder="Nombre del planeta/luna"
+        type="text"
+        class="form-control"
+        id="inputName"
+        aria-describedby="emailHelp"
+      />
+    </div>
+    <div class="form-group">
+      <label for="inputCoords">Coordenadas</label>
+      <input
+        name="coords"
+        placeholder="Coordenadas planeta/luna"
+        type="text"
+        class="form-control"
+        id="inputCoords"
+        aria-describedby="emailHelp"
+      />
+    </div>
+    <div class="form-group">
+      <label for="inputType">Tipo</label>
+      <select name="planetType" class="form-control" id="inputType">
+        <option value="planet">Planeta</option>
+        <option value="moon">Luna</option>
+      </select>
+    </div>
+    <button type="submit" class="btn btn-primary">Agregar</button>
+  </form>
 </div>
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 <script>
+  console.log("te pica");
+  import axios from "axios";
+  axios
+    .get("https://jsonplaceholder.typicode.com/todos/1")
+    .then(res => {
+      console.log(res.ata);
+    })
+    .catch(err => {
+      console.error(err);
+    });
 </script>
-{{!-- {{> footer}} --}}
+{{> footer}}

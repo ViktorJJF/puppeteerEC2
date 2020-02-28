@@ -55,7 +55,7 @@ let playersToHunt = [];
 
 (async () => {
   //init
-  await bot.begin("prod");
+  await bot.begin("dev");
   await bot.login("jimenezflorestacna@gmail.com", "sed4cfv52309@");
   // await bot.login("vj.jimenez96@gmail.com", "sed4cfv52309@");
   // first execution
@@ -89,7 +89,7 @@ let playersToHunt = [];
     for (const playerToHunt of playersToHunt) {
       await hunter(playerToHunt, bot);
     }
-    await timeout(13 * 60 * 1000);
+    await timeout(10 * 60 * 1000);
   }
   // for (let i = 3; i <= 6; i++) {
   //   await scanGalaxy(String(i), bot);
@@ -112,8 +112,17 @@ app.get("/hunter", async (req, res) => {
   let playersToHunt = await Player.find()
     .select("-planets")
     .exec();
-  console.log("players: ", playersToHunt);
   res.render("hunter", { playersToHunt });
+});
+
+app.get("/hunter/:id", async (req, res) => {
+  let playerId = req.params.id;
+  console.log("el id es: ", playerId);
+  // let playersToHunt = await Player.find()
+  //   .select("-planets")
+  //   .exec();
+  // console.log("players: ", playersToHunt);
+  res.render("partials/modalHunter");
 });
 
 app.get("/universo", async (req, res) => {
@@ -316,6 +325,10 @@ app.post("/api/hunter", (req, res) => {
   playersToHunt.push(playerToHunt);
   res.redirect("/hunter");
   console.log("ahora los jugadores son: ", playersToHunt);
+});
+
+app.get("/api/hunteados", (req, res) => {
+  res.json({ playersToHunt });
 });
 
 app.get("/api/scan", async (req, res) => {
