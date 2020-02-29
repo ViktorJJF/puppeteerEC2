@@ -81,3 +81,19 @@ hbs.registerHelper("state", state => {
       break;
   }
 });
+
+hbs.registerHelper("times", function(n, block) {
+  var accum = "";
+  for (var i = 0; i < n; ++i) accum += block.fn(i);
+  return accum;
+});
+
+hbs.registerHelper("for", function(from, to, incr, block) {
+  var accum = "";
+  for (var i = from; i <= to; i += incr) accum += block.fn(i);
+  return accum;
+});
+
+hbs.registerHelper("multiply", function(num1, num2) {
+  return parseInt(num1) * parseInt(num2);
+});

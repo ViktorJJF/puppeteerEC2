@@ -58,24 +58,6 @@ let playersToHunt = [];
   await bot.begin("prod");
   await bot.login("jimenezflorestacna@gmail.com", "sed4cfv52309@");
   // await bot.login("vj.jimenez96@gmail.com", "sed4cfv52309@");
-  // first execution
-  // let playersToHunt = [
-  //   "Edipo",
-  //   "Peacemaker",
-  //   "The HadeS",
-  //   "Coronavirus",
-  //   "SekSek",
-  //   "Makavrox",
-  //   "Atrevete",
-  //   "Man Yun Kin",
-  //   "Miss Dark",
-  //   "Nanatzu No Taisai",
-  //   "Xendor",
-  //   "Lyram",
-  //   "Lord Tycho",
-  //   "EN VENTA",
-  //   "Renegade Ferret"
-  // ];
   let playersFromDB = await Player.find({}, ["nickname", "hunt"]);
   console.log("players from db es:", playersFromDB);
   playersFromDB.forEach(player => {
@@ -109,10 +91,27 @@ app.get("/about", (req, res) => {
 });
 
 app.get("/hunter", async (req, res) => {
-  let playersToHunt = await Player.find()
+  let { page, perPage } = req.query;
+  let options = {
+    skip: (parseInt(page) - 1) * parseInt(perPage) || 0,
+    limit: parseInt(perPage) || 5
+  };
+  let playersToHunt = await Player.find({}, null, options)
     .select("-planets")
     .exec();
-  res.render("hunter", { playersToHunt });
+  let totalPlayersToHunt = await Player.count();
+  let allPlayersToHunt = await Player.find({})
+    .select("-planets")
+    .exec();
+  let totalPages = Math.ceil(totalPlayersToHunt / perPage);
+  res.render("hunter", {
+    playersToHunt,
+    totalPlayersToHunt,
+    page,
+    perPage,
+    totalPages,
+    allPlayersToHunt
+  });
 });
 
 app.get("/hunter/:id", async (req, res) => {
@@ -246,6 +245,10 @@ app.get("/api/hunter", async (req, res) => {
 //   res.json({ ok: true, playerInfo });
 // });
 
+app.get("/test", (req, res) => {
+  res.render("test");
+});
+
 app.post("/api/players", async (req, res) => {
   let body = req.body;
   let nickname = body.nickname;
@@ -303,6 +306,19 @@ app.post("/api/activities", (req, res) => {
       ok: true
     });
   });
+});
+
+app.get("/api/players/:id", async (req, res) => {
+  try {
+    let playerId = req.params.id;
+    let playersToHunt;
+    if (playerId) {
+      playersToHunt = await Player.find({ _id: playerId });
+    } else playersToHunt = await Player.find();
+    res.json({ ok: true, playersToHunt });
+  } catch (error) {
+    res.json({ ok: false, msg: "algo salio mal..." });
+  }
 });
 
 app.get("/api/players", async (req, res) => {

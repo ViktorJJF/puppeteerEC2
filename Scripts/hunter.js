@@ -2,6 +2,7 @@ const { Random, timeout, msToTime } = require("../utils/utils");
 const Player = require("../models/Players");
 const ogameApi = require("../ogameApi");
 const { PendingXHR } = require("pending-xhr-puppeteer");
+const sendTelegramMessage = require("../telegramService.js");
 
 async function beginHunter(nickname, bot) {
   console.log("se aplicara hunter a este jugador: ", nickname);
@@ -15,6 +16,7 @@ async function beginHunter(nickname, bot) {
         id: playerApi.id,
         nickname: playerApi.nickname,
         planets: playerApi.planets,
+        isOn: true,
         notes: ""
       });
       playerInfo = await player.save();
@@ -25,6 +27,7 @@ async function beginHunter(nickname, bot) {
     //hunter
     const pendingXHR = new PendingXHR(page);
     console.log("empezando hunter para...", playerInfo.nickname);
+    let isOn = false;
     for (const planet of playerInfo.planets) {
       // if (planet.active) {
       let activity = await bot.checkPlanetActivity(
@@ -38,7 +41,16 @@ async function beginHunter(nickname, bot) {
         planet.active = false;
         await playerInfo.save();
       } else planet.activities.push(activity);
+      if (activity.lastActivity === "on") isOn = true;
       // }
+    }
+    if (!isOn && playerInfo.isOn == true) {
+      console.log(playerInfo.nickname, " esta of!");
+      sendTelegramMessage(`<b>${playerInfo.nickname}</b> está off 💤💤💤`);
+      playerInfo.isOn = false;
+    }
+    if (isOn && playerInfo.isOn == false) {
+      playerInfo.isOn = true;
     }
     await playerInfo.save();
     playerInfo = null;

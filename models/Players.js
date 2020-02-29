@@ -13,6 +13,10 @@ let playersSchema = new Schema({
     type: Boolean,
     default: false
   },
+  isOn: {
+    type: Boolean,
+    default: true
+  },
   planets: [
     {
       id: String,

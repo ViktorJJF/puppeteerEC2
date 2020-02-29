@@ -18,7 +18,7 @@
       <tbody>
         {{#each playersToHunt as |playerTohunt i|}}
         <tr>
-          <th scope="row">{{index i}}</th>
+          <th scope="row">{{multiply (index i) ../page}}</th>
           <td>{{ nickname }}</td>
           <td>
             <form action="/universo" method="POST">
@@ -53,15 +53,38 @@
             </form>
           </td>
           <td>
-            <!-- Button trigger modal -->
-            <a class="btn btn-primary" href="/hunter/{{ _id }}" role="button"
-              >Editar</a
+            <button
+              onclick="editPlayer(this)"
+              id="editPlayer"
+              type="button"
+              playerId="{{ _id }}"
+              class="btn btn-primary"
+              data-toggle="modal"
+              data-target="#exampleModal"
             >
+              Editar
+            </button>
           </td>
         </tr>
         {{/each}}
       </tbody>
     </table>
+    {{ totalPlayersToHunt }}
+    <nav aria-label="Page navigation example mr-3">
+      <ul class="pagination justify-content-end">
+        <li class="page-item"><a class="page-link" href="#">Atrás</a></li>
+        {{#for 1 totalPages 1}}
+        <li class="page-item">
+          <a
+            class="page-link"
+            href="/hunter?page={{this}}&&perPage=5"
+            >{{this}}</a
+          >
+        </li>
+        {{/for}}
+        <li class="page-item"><a class="page-link" href="#">Adelante</a></li>
+      </ul>
+    </nav>
   </div>
 
   <form action="/api/players" method="POST">
@@ -93,7 +116,7 @@
     <div class="form-group">
       <label for="playerNameInput">Nombre del jugador</label>
       <select name="nickname" class="custom-select" id="playerNameInput">
-        {{#each playersToHunt}}
+        {{#each allPlayersToHunt}}
         <option value="{{ nickname }}">{{ nickname }}</option>
         {{/each}}
       </select>
@@ -141,17 +164,32 @@
     <button type="submit" class="btn btn-primary">Agregar</button>
   </form>
 </div>
-<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
-<script>
-  console.log("te pica");
-  import axios from "axios";
-  axios
-    .get("https://jsonplaceholder.typicode.com/todos/1")
-    .then(res => {
-      console.log(res.ata);
-    })
-    .catch(err => {
-      console.error(err);
-    });
-</script>
+
 {{> footer}}
+<script>
+  //   document.addEventListener(
+  //     "click",
+  //     event => {
+  //       if (!event.target.matches("#editPlayer")) return;
+  //       event.preventDefault();
+  //       console.log(event.target.getAttribute("playerid"));
+  //     },
+  //     false
+  //   );
+  //   let editPlayerButtons = document.querySelectorAll("#editPlayer");
+  //   editPlayerButtons.forEach(button => {
+  //     button.addEventListener("click", e => {
+  //       console.log("elemento: ", e.target);
+  //     });
+  //   });
+  function editPlayer(e) {
+    let playerId = e.getAttribute("playerId");
+    fetch("/api/players/" + playerId)
+      .then(function(response) {
+        return response.json();
+      })
+      .then(function(myJson) {
+        console.log(myJson);
+      });
+  }
+</script>
