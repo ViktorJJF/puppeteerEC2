@@ -3,7 +3,7 @@ const axios = require("axios");
 let sendTelegramMessage = message => {
   axios
     .post(
-      "http://ec2-52-87-178-225.compute-1.amazonaws.com:3000/api/telegram/message",
+      "http://ec2-52-90-106-105.compute-1.amazonaws.com:3000/api/telegram/message",
       { message }
     )
     .then(res => {
