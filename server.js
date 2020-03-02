@@ -284,7 +284,7 @@ app.post("/api/players/planet", async (req, res) => {
     planetType: body.planetType,
     activities: []
   };
-  let playerToUpdate = await (await Player.findOne({ nickname }))
+  let playerToUpdate = await Player.findOne({ nickname })
     .select("-planets.activities")
     .exec();
   playerToUpdate.planets.push(newPlanet);
