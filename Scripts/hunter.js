@@ -27,7 +27,8 @@ async function beginHunter(nickname, bot) {
     //hunter
     const pendingXHR = new PendingXHR(page);
     console.log("empezando hunter para...", playerInfo.nickname);
-    let isOn = false;
+    let isOn = false,
+      isAllOff = true;
     for (const planet of playerInfo.planets) {
       // if (planet.active) {
       let activity = await bot.checkPlanetActivity(
@@ -42,14 +43,19 @@ async function beginHunter(nickname, bot) {
         await playerInfo.save();
       } else planet.activities.push(activity);
       if (activity.lastActivity === "on") isOn = true;
+      if (activity.lastActivity !== "off") isAllOff = false;
       // }
     }
-    if (!isOn && playerInfo.isOn == true) {
+    if (!isOn) {
       console.log(playerInfo.nickname, " esta of!");
-      sendTelegramMessage(`<b>${playerInfo.nickname}</b> está off 💤💤💤`);
+      if (isAllOff)
+        sendTelegramMessage(
+          `<b>${playerInfo.nickname}</b> está <b>totalmente</b>💤💤💤`
+        );
+      else sendTelegramMessage(`<b>${playerInfo.nickname}</b> está 💤💤💤`);
       playerInfo.isOn = false;
     }
-    if (isOn && playerInfo.isOn == false) {
+    if (isOn) {
       playerInfo.isOn = true;
     }
     await playerInfo.save();

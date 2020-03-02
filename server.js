@@ -57,7 +57,7 @@ let playersToHunt = [];
   //init
   await bot.begin("prod");
   await bot.login("jimenezflorestacna@gmail.com", "sed4cfv52309@");
-  // await bot.login("vj.jimenez96@gmail.com", "sed4cfv52309@");
+  // await bot.login("rodrigo.diazranilla@gmail.com", "phoneypeople");
   let playersFromDB = await Player.find({}, ["nickname", "hunt"]);
   console.log("players from db es:", playersFromDB);
   playersFromDB.forEach(player => {
@@ -284,7 +284,9 @@ app.post("/api/players/planet", async (req, res) => {
     planetType: body.planetType,
     activities: []
   };
-  let playerToUpdate = await Player.findOne({ nickname });
+  let playerToUpdate = await (await Player.findOne({ nickname }))
+    .select("-planets.activities")
+    .exec();
   playerToUpdate.planets.push(newPlanet);
   await playerToUpdate.save();
   res.redirect("/hunter");
@@ -349,7 +351,9 @@ app.get("/api/hunteados", (req, res) => {
 
 app.get("/api/scan", async (req, res) => {
   let nickname = req.query.nickname.toLowerCase();
-  let playerInfo = await Player.findOne({ nickname });
+  let playerInfo = await Player.findOne({ nickname })
+    .select("-planets.activities")
+    .exec();
   if (!playerInfo) {
     playerInfo = await ogameApi.getPlayerInfo(nickname);
   }
