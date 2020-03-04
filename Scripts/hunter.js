@@ -46,22 +46,22 @@ async function beginHunter(nickname, bot) {
       if (activity.lastActivity !== "off") isAllOff = false;
       // }
     }
-    // if (!isOn) {
-    //   console.log(playerInfo.nickname, " esta of!");
-    //   if (isAllOff)
-    //     sendTelegramMessage(
-    //       `<b>${playerInfo.nickname}</b> está <b>totalmente</b>💤💤💤`
-    //     );
-    //   else sendTelegramMessage(`<b>${playerInfo.nickname}</b> está 💤💤💤`);
-    //   playerInfo.isOn = false;
-    // }
-    if (isOn) {
-      sendTelegramMessage(
-        `⚠️⚠️<b>${playerInfo.nickname}</b> parece que alguien te espió!⚠️⚠️`
-      );
+    if (!isOn && playerInfo.isOn == true) {
+      console.log(playerInfo.nickname, " esta of!");
+      if (isAllOff)
+        sendTelegramMessage(
+          `<b>${playerInfo.nickname}</b> está <b>totalmente</b>💤💤💤`
+        );
+      else sendTelegramMessage(`<b>${playerInfo.nickname}</b> está 💤💤💤`);
+      playerInfo.isOn = false;
+    }
+    if (isOn && playerInfo.isOn == false) {
+      // sendTelegramMessage(
+      //   `⚠️⚠️<b>${playerInfo.nickname}</b> parece que alguien te espió!⚠️⚠️`
+      // );
       playerInfo.isOn = true;
     }
-    // await playerInfo.save();
+    await playerInfo.save();
     playerInfo = null;
     //end hunter
     await page.close();
