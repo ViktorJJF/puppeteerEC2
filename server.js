@@ -55,7 +55,7 @@ let playersToHunt = [];
 
 (async () => {
   //init
-  await bot.begin("prod");
+  await bot.begin("dev");
   await bot.login("jimenezflorestacna@gmail.com", "sed4cfv52309@");
   // await bot.login("rodrigo.diazranilla@gmail.com", "phoneypeople");
   let playersFromDB = await Player.find({}, ["nickname", "hunt"]);
@@ -70,10 +70,10 @@ let playersToHunt = [];
   while (1 == 1) {
     for (const playerToHunt of playersToHunt) {
       await hunter(playerToHunt, bot);
-      await timeout(8 * 60 * 1000);
+      await timeout(10 * 60 * 1000);
     }
   }
-  // for (let i = 3; i <= 6; i++) {
+  // for (let i = 1; i <= 6; i++) {
   //   await scanGalaxy(String(i), bot);
   //   await timeout(5 * 1000);
   // }
