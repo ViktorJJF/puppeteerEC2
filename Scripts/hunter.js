@@ -56,9 +56,6 @@ async function beginHunter(nickname, bot) {
       playerInfo.isOn = false;
     }
     if (isOn && playerInfo.isOn == false) {
-      // sendTelegramMessage(
-      //   `⚠️⚠️<b>${playerInfo.nickname}</b> parece que alguien te espió!⚠️⚠️`
-      // );
       playerInfo.isOn = true;
     }
     await playerInfo.save();
