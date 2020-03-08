@@ -313,13 +313,17 @@ app.post("/api/activities", (req, res) => {
 app.get("/api/players/:id", async (req, res) => {
   try {
     let playerId = req.params.id;
-    let playersToHunt;
+    console.log("recibi este id: ", playerId);
+    let playerInfo;
     if (playerId) {
-      playersToHunt = await Player.find({ _id: playerId });
-    } else playersToHunt = await Player.find();
-    res.json({ ok: true, playersToHunt });
+      playerInfo = await Player.findOne({ id: playerId })
+        .select("-planets.activities")
+        .exec();
+    } else playerInfo = [];
+    res.json({ ok: true, playerInfo });
   } catch (error) {
     res.json({ ok: false, msg: "algo salio mal..." });
+    console.log(error);
   }
 });
 

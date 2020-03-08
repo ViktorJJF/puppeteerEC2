@@ -58,10 +58,10 @@ async function beginHunter(nickname, bot) {
     if (isOn && playerInfo.isOn == false) {
       playerInfo.isOn = true;
     }
-    await playerInfo.save();
+    // await playerInfo.save();
     playerInfo = null;
     //end hunter
-    await page.close();
+    // await page.close();
     console.log("se termino de esperar los 5 seg");
   } catch (error) {
     console.log("se dio un error en hunter..probablemente el logeo");
