@@ -31,6 +31,8 @@ async function beginHunter(nickname, bot) {
       isAllOff = true;
     for (const planet of playerInfo.planets) {
       // if (planet.active) {
+      if (planet.planetType === "planet") {
+      }
       let activity = await bot.checkPlanetActivity(
         planet.coords,
         planet.planetType,

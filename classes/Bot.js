@@ -349,25 +349,36 @@ module.exports = class Bot {
     }
     let galaxyInputSelector = "#galaxy_input";
     await page.waitForSelector(galaxyInputSelector);
-    await page.click(galaxyInputSelector);
-    await page.type(galaxyInputSelector, galaxy, {
-      delay: this.typingDelay
-    });
-    let systemInputSelector =
-      "#galaxycomponent > #inhalt > #galaxyHeader #system_input";
+    let galaxyCurrentValue = await page.evaluate(
+      () => document.querySelector("#galaxy_input").value
+    );
+    if (galaxyCurrentValue !== galaxy) {
+      await page.click(galaxyInputSelector);
+      await page.type(galaxyInputSelector, galaxy, {
+        delay: this.typingDelay
+      });
+    }
+    let systemInputSelector = "#system_input";
     await page.waitForSelector(systemInputSelector);
-    await page.click(systemInputSelector);
-    await page.type(systemInputSelector, system, {
-      delay: this.typingDelay
-    });
-    //click !vamos!
-    await page.waitForSelector(
-      "#galaxycomponent > #inhalt > #galaxyHeader > form > .btn_blue:nth-child(9)"
+    let systemCurrentValue = await page.evaluate(
+      () => document.querySelector("#system_input").value
     );
-    // await timeout(1000);
-    await page.click(
-      "#galaxycomponent > #inhalt > #galaxyHeader > form > .btn_blue:nth-child(9)"
-    );
+    if (systemCurrentValue !== system) {
+      await page.click(systemInputSelector);
+      await page.type(systemInputSelector, system, {
+        delay: this.typingDelay
+      });
+    }
+    if (galaxyCurrentValue !== galaxy || systemCurrentValue !== system) {
+      //click !vamos!
+      await page.waitForSelector(
+        "#galaxycomponent > #inhalt > #galaxyHeader > form > .btn_blue:nth-child(9)"
+      );
+      // await timeout(1000);
+      await page.click(
+        "#galaxycomponent > #inhalt > #galaxyHeader > form > .btn_blue:nth-child(9)"
+      );
+    }
     await page.waitForSelector("tr.row");
   }
 
