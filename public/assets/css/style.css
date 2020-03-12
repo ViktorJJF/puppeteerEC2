@@ -1,11 +1,16 @@
+* {
+    padding: 0px;
+    margin: 0px;
+}
+
 footer {
-    background-color: black;
+    background-color: #212529;
     color: aliceblue;
     width: 100%;
-    /* position: fixed; */
+    position: fixed;
     bottom: 0px;
     text-align: center;
-    padding: 20px;
+    padding: 10px;
 }
 
 .ogameActivity {
@@ -105,6 +110,26 @@ th {
     background-size: 90%;
     -webkit-filter: brightness(90%);
     filter: brightness(90%);
+}
+
+.custom-margin {
+    padding-bottom: 70px;
+    padding-top: 30px;
+}
+
+.bg-ogame {
+    background: url("/images/ogame-bg3.jpg");
+    height: 90vh;
+    /* Center and scale the image nicely */
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+
+.background-overlay {
+    height: 100%;
+    background: rgba(48, 51, 107, 0.3);
 }
 
 /* td {

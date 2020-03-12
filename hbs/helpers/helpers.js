@@ -88,12 +88,21 @@ hbs.registerHelper("times", function(n, block) {
   return accum;
 });
 
+hbs.registerHelper("sum", function(num1, num2) {
+  return parseInt(num1) + parseInt(num2);
+});
+
+hbs.registerHelper("diff", function(num1, num2) {
+  let diff = parseInt(num1) - parseInt(num2);
+  return diff > 0 ? diff : 1;
+});
+
 hbs.registerHelper("for", function(from, to, incr, block) {
   var accum = "";
   for (var i = from; i <= to; i += incr) accum += block.fn(i);
   return accum;
 });
 
-hbs.registerHelper("multiply", function(num1, num2) {
-  return parseInt(num1) * parseInt(num2);
+hbs.registerHelper("paginatedTableIndex", function(index, pageNumber, perPage) {
+  return parseInt(index) + parseInt(pageNumber - 1) * parseInt(perPage);
 });

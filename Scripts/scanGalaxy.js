@@ -17,7 +17,7 @@ let scanGalaxy = async (galaxyNumber, bot) => {
       console.log("escaneado: ", planets);
       solarSystemPlanets.push(planets);
     }
-    console.log("se termino de scanear g1");
+    console.log("se termino de scanear g", galaxyNumber);
     let galaxy = new Galaxy({
       number: galaxyNumber,
       solarSystem: JSON.parse(JSON.stringify(solarSystemPlanets))

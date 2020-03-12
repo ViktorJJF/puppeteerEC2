@@ -3,8 +3,8 @@
 
 {{> navbar }}
 {{!-- {{dates.0.20.13}} --}}
-<div class="ml-5 mt-5">
-    <form action="/graficas" method="POST">
+<div class="ml-5 custom-margin">
+    <form action="/tablas" method="POST">
         <div class="form-group">
             <label for="playerNameInput"><b>Nickname del jugador</b></label>
             <div class="row">
@@ -22,7 +22,7 @@
                     <div class="custom-control custom-checkbox mr-sm-2">
                         <input onchange="this.form.submit()" name="showDetails" type="checkbox"
                             class="custom-control-input" id="customControlAutosizing" {{#if showDetails}}checked{{/if}}>
-                        <label class="custom-control-label" for="customControlAutosizing">Ver Gráficas
+                        <label class="custom-control-label" for="customControlAutosizing">Ver Tablas
                             detalladas</label>
                     </div>
                 </div>
@@ -31,7 +31,7 @@
     </form>
     <h3>Resumen de actividades de: <i>{{playerToHunt.nickname}}</i></h3>
     {{#each playerToHunt.[planets].[0].[dates] as |date k|}}
-    <h4>Fecha: {{getDateByDay k}}</h4>
+    <b>Fecha: {{getDateByDay k}}</b>
     <table class="table table-bordered">
         <thead class="thead-dark">
             <tr>
@@ -72,3 +72,4 @@
     </table>
     {{/each}}
 </div>
+{{> footer}}

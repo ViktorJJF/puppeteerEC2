@@ -511,7 +511,7 @@ module.exports = class Bot {
     for (const planet of planetsSelector) {
       let planetJson = {};
       planetJson.position = position;
-      let planetExist = await planet.$("a>span");
+      let planetExist = await planet.$(".ListImage");
       if (planetExist) {
         // await planetExist.hover();
         // // await timeout(1000);
@@ -527,11 +527,16 @@ module.exports = class Bot {
         //     shipsQty: shipsQty ? shipsQty.innerText : 0
         //   };
         // });
-        planetJson.name = await planet.evaluate(
-          e => e.querySelector("td.planetname").innerText
-        );
-        planetJson.playerName = await planet.evaluate(
-          e => e.querySelector("td.playername>a>span").innerText
+        planetJson.name = await planet.evaluate(e => {
+          let planetNameSelector = e.querySelector("td.planetname");
+          return planetNameSelector
+            ? planetNameSelector.innerText
+            : "Desconocido...";
+        });
+        planetJson.playerName = await planet.evaluate(e =>
+          e.querySelector("td.playername>a>span")
+            ? e.querySelector("td.playername>a>span").innerText
+            : "Cosaco"
         );
         planetJson.rank = await planet.evaluate(e =>
           e.querySelector(".uv-galaxy-rank")
@@ -574,6 +579,10 @@ module.exports = class Bot {
           let playerId = e.querySelector("td.action a.sendMail");
           return playerId ? playerId.getAttribute("data-playerid") : 0;
         });
+        //me
+        if (planetJson.playerName === "Cosaco") {
+          planetJson.playerId = "100634";
+        }
       }
       position++;
       planets.push(planetJson);

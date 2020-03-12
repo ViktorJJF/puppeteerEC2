@@ -2,116 +2,128 @@
 
 {{> navbar }}
 {{> modalHunter }}
-<div class="container mt-3 mb-3">
-  <h2>Listado de hunteados</h2>
+<div class="container mb-3 custom-margin">
+  <h2>
+    Listado de hunteados (<b>{{ totalPlayersToHunt }} jugadores</b>)
+  </h2>
 
   <div class="card">
-    <table class="table">
-      <thead>
-        <tr>
-          <th scope="col">#</th>
-          <th scope="col">Jugador</th>
-          <th scope="col">Hunteando?</th>
-          <th scope="col">Opciones</th>
-        </tr>
-      </thead>
-      <tbody>
-        {{#each playersToHunt as |playerTohunt i|}}
-        <tr>
-          <th scope="row">{{multiply (index i) ../page}}</th>
-          <td>{{ nickname }}</td>
-          <td>
-            <form action="/universo" method="POST">
-              <div class="custom-control custom-checkbox mr-sm-2">
-                {{#if hunt}}
-                <input
-                  name="hunt"
-                  type="checkbox"
-                  class="custom-control-input"
-                  id="customControlAutosizing{{ i }}"
-                  checked
-                />
-                <label
-                  class="custom-control-label"
-                  for="customControlAutosizing{{ i }}"
-                  >Sí</label
-                >
-                {{else}}
-                <input
-                  name="hunt"
-                  type="checkbox"
-                  class="custom-control-input"
-                  id="customControlAutosizing{{ i }}"
-                />
-                <label
-                  class="custom-control-label"
-                  for="customControlAutosizing{{ i }}"
-                  >No</label
-                >
-                {{/if}}
-              </div>
-            </form>
-          </td>
-          <td>
-            <button
-              onclick="editPlayer(this)"
-              id="editPlayer"
-              type="button"
-              playerId="{{ _id }}"
-              class="btn btn-primary"
-              data-toggle="modal"
-              data-target="#exampleModal"
-            >
-              Editar
-            </button>
-          </td>
-        </tr>
-        {{/each}}
-      </tbody>
-    </table>
-    {{ totalPlayersToHunt }}
-    <nav aria-label="Page navigation example mr-3">
-      <ul class="pagination justify-content-end">
-        <li class="page-item"><a class="page-link" href="#">Atrás</a></li>
-        {{#for 1 totalPages 1}}
-        <li class="page-item">
-          <a
-            class="page-link"
-            href="/hunter?page={{this}}&&perPage=5"
-            >{{this}}</a
-          >
-        </li>
-        {{/for}}
-        <li class="page-item"><a class="page-link" href="#">Adelante</a></li>
-      </ul>
-    </nav>
+    <div class="table-responsive">
+      <table class="table">
+        <thead>
+          <tr>
+            <th scope="col">#</th>
+            <th scope="col">Jugador</th>
+            <th scope="col">Hunteando?</th>
+            <th scope="col">Opciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          {{#each playersToHunt as |playerTohunt i|}}
+          <tr>
+            <th scope="row">
+              {{paginatedTableIndex (index i) ../page ../perPage}}
+            </th>
+            <td>{{ nickname }}</td>
+            <td>
+              <form action="/universo" method="POST">
+                <div class="custom-control custom-checkbox mr-sm-2">
+                  {{#if hunt}}
+                  <input
+                    name="hunt"
+                    type="checkbox"
+                    class="custom-control-input"
+                    id="customControlAutosizing{{ i }}"
+                    checked
+                  />
+                  <label
+                    class="custom-control-label"
+                    for="customControlAutosizing{{ i }}"
+                    >Sí</label
+                  >
+                  {{else}}
+                  <input
+                    name="hunt"
+                    type="checkbox"
+                    class="custom-control-input"
+                    id="customControlAutosizing{{ i }}"
+                  />
+                  <label
+                    class="custom-control-label"
+                    for="customControlAutosizing{{ i }}"
+                    >No</label
+                  >
+                  {{/if}}
+                </div>
+              </form>
+            </td>
+            <td>
+              <button
+                onclick="editPlayer(this)"
+                id="editPlayer"
+                type="button"
+                playerId="{{ _id }}"
+                class="btn btn-primary"
+                data-toggle="modal"
+                data-target="#exampleModal"
+              >
+                Editar
+              </button>
+            </td>
+          </tr>
+          {{/each}}
+        </tbody>
+      </table>
+    </div>
   </div>
+  <nav aria-label="Page navigation example mr-3">
+    <ul class="pagination justify-content-end flex-wrap">
+      <li class="page-item">
+        <a
+          class="page-link"
+          href="/hunter?page={{ diff page 1 }}&&perPage={{ perPage }}"
+          >Atrás</a
+        >
+      </li>
+      {{#for 1 totalPages 1}}
+      <li class="page-item {{#if_eq this ../page}}active{{/if_eq}}">
+        <a
+          class="page-link"
+          href="/hunter?page={{this}}&&perPage=5"
+          >{{this}}</a
+        >
+      </li>
+      {{/for}}
+      <li class="page-item">
+        <a
+          class="page-link"
+          href="/hunter?page={{ sum page 1 }}&&perPage={{ perPage }}"
+          >Adelante</a
+        >
+      </li>
+    </ul>
+  </nav>
 
   <form action="/api/players" method="POST">
-    <div class="container">
-      <div class="row d-flex align-content-center">
-        <div class="col-10">
-          <div class=" form-group">
-            <label for="exampleInputEmail1"
-              >Nombre del jugador a Controlar</label
-            >
-            <input
-              name="nickname"
-              type="text"
-              class="form-control"
-              id="exampleInputEmail1"
-              placeholder="ESCRIBE SU NICK"
-            />
-          </div>
+    <h3 class="mt-4">¿Quieres agregar más jugadores al Pepehunter?</h3>
+    <div class="row">
+      <div class="col-12 col-sm-10">
+        <div class=" form-group">
+          <input
+            name="nickname"
+            type="text"
+            class="form-control"
+            id="exampleInputEmail1"
+            placeholder="ESCRIBE SU NICK"
+          />
         </div>
-
-        <div class="col-2">
-          <button type="submit" class="btn btn-primary">Agregar Jugador</button>
-        </div>
+      </div>
+      <div class="col-12 col-sm-2">
+        <button type="submit" class="btn btn-primary">Agregar Jugador</button>
       </div>
     </div>
   </form>
-  <h3>Agregar planeta/Luna</h3>
+  <h3 class="mt-3">¿Faltan planetas/lunas a un jugador? Agrégalos!</h3>
   <form action="/api/players/planet" method="POST">
     <div class="form-group">
       <label for="playerNameInput">Nombre del jugador</label>
@@ -121,7 +133,7 @@
         {{/each}}
       </select>
     </div>
-    <div class="form-group">
+    <!-- <div class="form-group">
       <label for="inputID">ID</label>
       <input
         name="id"
@@ -131,7 +143,7 @@
         id="inputID"
         aria-describedby="emailHelp"
       />
-    </div>
+    </div> -->
     <div class="form-group">
       <label for="inputName">Nombre</label>
       <input

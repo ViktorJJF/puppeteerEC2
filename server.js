@@ -58,6 +58,7 @@ let playersToHunt = [];
   await bot.begin("prod");
   await bot.login("jimenezflorestacna@gmail.com", "sed4cfv52309@");
   // await bot.login("rodrigo.diazranilla@gmail.com", "phoneypeople");
+  // await bot.login("vj.jimenez96@gmail.com", "sed4cfv52309@");
   let playersFromDB = await Player.find({}, ["nickname", "hunt"]);
   console.log("players from db es:", playersFromDB);
   playersFromDB.forEach(player => {
@@ -73,16 +74,13 @@ let playersToHunt = [];
     }
     await timeout(8 * 60 * 1000);
   }
-  // for (let i = 1; i <= 6; i++) {
-  //   await scanGalaxy(String(i), bot);
-  //   await timeout(5 * 1000);
-  // }
 })();
 
 app.get("/", (req, res) => {
   res.render("home", {
     nombre: "PepeHunter",
-    anio: new Date().getFullYear()
+    anio: new Date().getFullYear(),
+    path: "/"
   });
 });
 
@@ -92,6 +90,8 @@ app.get("/about", (req, res) => {
 
 app.get("/hunter", async (req, res) => {
   let { page, perPage } = req.query;
+  page = page || 1;
+  perPage = perPage || 5;
   let options = {
     skip: (parseInt(page) - 1) * parseInt(perPage) || 0,
     limit: parseInt(perPage) || 5
@@ -110,7 +110,8 @@ app.get("/hunter", async (req, res) => {
     page,
     perPage,
     totalPages,
-    allPlayersToHunt
+    allPlayersToHunt,
+    path: "/hunter"
   });
 });
 
@@ -138,7 +139,8 @@ app.get("/universo", async (req, res) => {
     galaxiesIndex,
     showRanking,
     galaxyNumber,
-    date
+    date,
+    path: "/universo"
   });
 });
 
@@ -149,7 +151,7 @@ app.post("/universo", async (req, res) => {
   res.redirect(`/universo?galaxia=${galaxy}&&ranking=${showRanking}`);
 });
 
-app.get("/graficas", async (req, res) => {
+app.get("/tablas", async (req, res) => {
   let players = await Player.find()
     .select("nickname -_id")
     .exec();
@@ -225,14 +227,15 @@ app.get("/graficas", async (req, res) => {
     times,
     dates,
     totalDays,
-    showDetails
+    showDetails,
+    path: "/tablas"
   });
 });
 
-app.post("/graficas", (req, res) => {
+app.post("/tablas", (req, res) => {
   let nickname = req.body.nickname;
   let showDetails = req.body.showDetails == "on" ? "true" : false;
-  res.redirect(`/graficas?nickname=${nickname}&&detailed=${showDetails}`);
+  res.redirect(`/tablas?nickname=${nickname}&&detailed=${showDetails}`);
 });
 
 app.get("/api/hunter", async (req, res) => {
@@ -278,7 +281,7 @@ app.post("/api/players/planet", async (req, res) => {
   let body = req.body;
   let nickname = body.nickname;
   let newPlanet = {
-    id: body.id,
+    id: "123123",
     name: body.name,
     coords: body.coords,
     planetType: body.planetType,
@@ -388,6 +391,25 @@ app.get("/api/scan", async (req, res) => {
   } else {
     res.json({ ok: true, playerInfo: {} });
   }
+});
+
+app.get("/api/scan/universe", async (req, res) => {
+  // let number = "6";
+  // let galaxy = await Galaxy.findOne({ number });
+  // for (let i = 0; i < galaxy.solarSystem.length; i++) {
+  //   for (let j = 0; j < 15; j++) {
+  //     galaxy.solarSystem[i][j].coords = `${number}:${i + 1}:${j + 1}`;
+  //   }
+  // }
+  // galaxy.markModified("solarSystem");
+  // let newGalaxy = await galaxy.save();
+  // console.log("se termino la actualizacion");
+  // for (let i = 1; i <= 6; i++) {
+  //   await scanGalaxy(String(i), bot);
+  //   await timeout(5 * 1000);
+  // }
+
+  return res.json({ ok: true, msg: "Empezando a escanear universo" });
 });
 
 app.listen(port, () => {

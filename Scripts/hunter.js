@@ -48,16 +48,20 @@ async function beginHunter(nickname, bot) {
       if (activity.lastActivity !== "off") isAllOff = false;
       // }
     }
-    if (!isOn && playerInfo.isOn == true) {
+    if (!isOn) {
       console.log(playerInfo.nickname, " esta of!");
       if (isAllOff)
         sendTelegramMessage(
           `<b>${playerInfo.nickname}</b> está <b>totalmente</b>💤💤💤`
         );
+      else if (playerInfo.isOn == false)
+        sendTelegramMessage(
+          `<b>${playerInfo.nickname}</b> sigue 💤💤💤 desde el anterior scaneo`
+        );
       else sendTelegramMessage(`<b>${playerInfo.nickname}</b> está 💤💤💤`);
       playerInfo.isOn = false;
     }
-    if (isOn && playerInfo.isOn == false) {
+    if (isOn) {
       playerInfo.isOn = true;
     }
     await playerInfo.save();

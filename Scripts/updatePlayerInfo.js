@@ -2,26 +2,32 @@ const Galaxy = require("../models/Galaxies");
 const Player = require("../models/Players");
 const mongoose = require("mongoose");
 
+let galaxies = [];
+
 let updatePlayerInfo = async playerId => {
   let player = await Player.findOne({ id: playerId })
     .select("-planets.activities")
     .exec();
-  console.log("actualizando informacion de : ", player.nickname);
+  console.log("actualizando info de: ", player.nickname);
   let planets = player.planets;
-  //   console.log(JSON.stringify(player, null, "  "));
-  let galaxies = await Galaxy.find({});
+  let scanPlanets = [];
   galaxies.forEach(galaxy => {
     galaxy.solarSystem.forEach(solarSystem => {
       solarSystem.forEach(planet => {
-        if (planet.playerId == playerId)
+        if (planet.playerId == playerId) {
           checkPlanetExist(planet, planets, player);
+          scanPlanets.push(planet);
+        }
       });
     });
   });
+  player.planets = deletePlanets(planets, scanPlanets, "coords");
+  player.markModified("planets");
   await player.save();
+  console.log("guardado con éxito");
 };
 
-let checkPlanetExist = async (planet, currentPlanets, player) => {
+let checkPlanetExist = (planet, currentPlanets, player) => {
   let newPlanet = {
     id: "",
     name: "",
@@ -71,6 +77,31 @@ let checkPlanetExist = async (planet, currentPlanets, player) => {
   }
 };
 
+let deletePlanets = (currentPlanets, scanPlanets, propertyToCompare) => {
+  for (let i = 0; i < currentPlanets.length; i++) {
+    let hasElement = false;
+    for (let j = 0; j < scanPlanets.length; j++) {
+      if (
+        currentPlanets[i][propertyToCompare] ===
+        scanPlanets[j][propertyToCompare]
+      ) {
+        hasElement = true;
+        j = 999999;
+      }
+    }
+    if (!hasElement) {
+      console.log(
+        "procediendo a eliminar: ",
+        currentPlanets[i].coords,
+        currentPlanets[i].name
+      );
+      currentPlanets.splice(i, 1);
+      i = -1;
+    }
+  }
+  return currentPlanets;
+};
+
 (async () => {
   mongoose.connect(
     "mongodb+srv://VictorJJF:Sed4cfv52309$@cluster0-ceisv.mongodb.net/pepebot",
@@ -82,6 +113,7 @@ let checkPlanetExist = async (planet, currentPlanets, player) => {
       console.log("DB online ONLINE");
     }
   );
+  galaxies = await Galaxy.find({});
   let playersToHunt = await Player.find({})
     .select("-planets.activities")
     .exec();

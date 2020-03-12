@@ -1,41 +1,46 @@
-<!-- Load Facebook SDK for JavaScript -->
-<div id="fb-root"></div>
-<script>(function (d, s, id) {
-        var js, fjs = d.getElementsByTagName(s)[0];
-        if (d.getElementById(id)) return;
-        js = d.createElement(s); js.id = id;
-        js.src = 'https://connect.facebook.net/es_LA/sdk/xfbml.customerchat.js#xfbml=1&version=v2.12&autoLogAppEvents=1';
-        fjs.parentNode.insertBefore(js, fjs);
-    }(document, 'script', 'facebook-jssdk'));</script>
-
-<!-- Your customer chat code -->
-<div class="fb-customerchat" attribution=install_email page_id="209556406394874" theme_color="#67b868"
-    logged_in_greeting="Soy Viktor UJCM 😀 , ¿en qué puedo ayudarte hoy?"
-    logged_out_greeting="Soy Viktor UJCM 😀 , ¿en qué puedo ayudarte hoy?">
-</div>
-
-
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-    <a class="navbar-brand" href="#">Navbar</a>
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
-        aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-    </button>
-
-    <div class="collapse navbar-collapse" id="navbarSupportedContent">
-        <ul class="navbar-nav mr-auto">
-            <li class="nav-item active">
-                <a class="nav-link" href="/">Home <span class="sr-only">(current)</span></a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="/hunter">Hunter</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="/graficas">Gráficas</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="/universo">Universo</a>
-            </li>
-        </ul>
-    </div>
+<nav
+  class="navbar navbar-expand-lg navbar-dark"
+  style="background-color: #000000;"
+>
+  <a class="navbar-brand" href="/">
+    Pepehunter
+  </a>
+  <button
+    class="navbar-toggler"
+    type="button"
+    data-toggle="collapse"
+    data-target="#navbarSupportedContent"
+    aria-controls="navbarSupportedContent"
+    aria-expanded="false"
+    aria-label="Toggle navigation"
+  >
+    <span class="navbar-toggler-icon"></span>
+  </button>
+  <div class="collapse navbar-collapse" id="navbarSupportedContent">
+    <ul class="navbar-nav mr-auto">
+      <li class="nav-item {{#if_eq path "/"}}active{{/if_eq}}">
+        <a class="nav-link" href="/">
+          Inicio
+          <span class="sr-only">
+            (current)
+          </span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link {{#if_eq path "/hunter"}}active{{/if_eq}}" href="/hunter">
+          Hunter
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link {{#if_eq path "/tablas"}}active{{/if_eq}}" href="/tablas">
+          Tablas
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link {{#if_eq path "/universo"}}active{{/if_eq}}" href="/universo">
+          Universo
+        </a>
+      </li>
+    </ul>
+  </div>
 </nav>
