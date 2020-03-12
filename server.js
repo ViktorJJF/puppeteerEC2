@@ -61,6 +61,7 @@ let playersToHunt = [];
   // await bot.login("vj.jimenez96@gmail.com", "sed4cfv52309@");
   let playersFromDB = await Player.find({}, ["nickname", "hunt"]);
   console.log("players from db es:", playersFromDB);
+  //change
   playersFromDB.forEach(player => {
     if (player.hunt) {
       playersToHunt.push(player.nickname);
