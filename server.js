@@ -395,22 +395,25 @@ app.get("/api/scan", async (req, res) => {
 });
 
 app.get("/api/scan/universe", async (req, res) => {
-  // let number = "6";
-  // let galaxy = await Galaxy.findOne({ number });
-  // for (let i = 0; i < galaxy.solarSystem.length; i++) {
-  //   for (let j = 0; j < 15; j++) {
-  //     galaxy.solarSystem[i][j].coords = `${number}:${i + 1}:${j + 1}`;
-  //   }
-  // }
-  // galaxy.markModified("solarSystem");
-  // let newGalaxy = await galaxy.save();
-  // console.log("se termino la actualizacion");
-  // for (let i = 1; i <= 6; i++) {
-  //   await scanGalaxy(String(i), bot);
-  //   await timeout(5 * 1000);
-  // }
+  res.json({ ok: true, msg: "Empezando a escanear universo" });
+  console.log("se termino la actualizacion");
+  for (let i = 1; i <= 6; i++) {
+    await scanGalaxy(String(i), bot);
+    // await timeout(5 * 1000);
+  }
 
-  return res.json({ ok: true, msg: "Empezando a escanear universo" });
+  for (let number = 1; number <= 6; number++) {
+    let galaxy = await Galaxy.findOne({ number: String(number) });
+    for (let i = 0; i < galaxy.solarSystem.length; i++) {
+      for (let j = 0; j < 15; j++) {
+        galaxy.solarSystem[i][j].coords = `${number}:${i + 1}:${j + 1}`;
+      }
+    }
+    galaxy.markModified("solarSystem");
+    let newGalaxy = await galaxy.save();
+  }
+
+  return;
 });
 
 app.listen(port, () => {

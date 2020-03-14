@@ -5,9 +5,10 @@ const mongoose = require("mongoose");
 let galaxies = [];
 
 let updatePlayerInfo = async playerId => {
-  let player = await Player.findOne({ id: playerId })
-    .select("-planets.activities")
-    .exec();
+  // let player = await Player.findOne({ id: playerId })
+  //   .select("-planets.activities")
+  //   .exec();
+  let player = await Player.findOne({ id: playerId });
   console.log("actualizando info de: ", player.nickname);
   let planets = player.planets;
   let scanPlanets = [];
@@ -114,7 +115,7 @@ let deletePlanets = (currentPlanets, scanPlanets, propertyToCompare) => {
     }
   );
   galaxies = await Galaxy.find({});
-  let playersToHunt = await Player.find({})
+  let playersToHunt = await Player.find()
     .select("-planets.activities")
     .exec();
   for (const player of playersToHunt) {

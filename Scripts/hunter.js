@@ -21,6 +21,7 @@ async function beginHunter(nickname, bot) {
       });
       playerInfo = await player.save();
     }
+    if (!playerInfo.hunt) return;
 
     var page = await bot.createNewPage();
     // let newPlayerInfo = await bot.hunter(playerInfo, page);
