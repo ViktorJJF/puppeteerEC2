@@ -14,9 +14,6 @@ let start = async (nickname, bot) => {
   }
 
   await Promise.all(promises);
-  // for (let i = 1; i <= 6; i++) {
-
-  // }
   console.log("Los planetas son:", globalPlanets);
 };
 
