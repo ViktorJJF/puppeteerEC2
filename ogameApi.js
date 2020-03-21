@@ -93,5 +93,6 @@ const getPlayerInfo = async nickname => {
 };
 
 module.exports = {
-  getPlayerInfo
+  getPlayerInfo,
+  getPlayerId
 };
