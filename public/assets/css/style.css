@@ -119,7 +119,7 @@ th {
 
 .bg-ogame {
     background: url("/images/ogame-bg3.jpg");
-    height: 90vh;
+    height: 100vh;
     /* Center and scale the image nicely */
     background-position: center;
     background-repeat: no-repeat;
@@ -130,6 +130,10 @@ th {
 .background-overlay {
     height: 100%;
     background: rgba(48, 51, 107, 0.3);
+}
+
+.full-height {
+    height: 100vh;
 }
 
 /* td {

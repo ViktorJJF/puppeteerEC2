@@ -4,8 +4,8 @@ let Schema = mongoose.Schema;
 
 let galaxiesSchema = new Schema(
   {
+    server: String,
     number: {
-      unique: true,
       type: String,
       required: [true, "el numero de galaxia es requerida"]
     },

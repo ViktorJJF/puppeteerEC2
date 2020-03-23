@@ -3,13 +3,20 @@
 
 {{> navbar }}
 <div class="bg-ogame">
-<div class="jumbotron background-overlay text-white">
-    <h1 class="display-4">Hola, {{capitalizar nombre}}!</h1>
-    <p class="lead">Herramienta para ogame.</p>
-    <hr class="my-4">
-    <p>A cazar!.</p>
-    <a class="btn btn-primary btn-lg" href="#" role="button">Saber más</a>
-</div>
+    <div class="container">
+        <div class="row full-height">
+            <div class="text-white mx-auto my-auto">
+                <h1 class="display-4">Hola, {{capitalizar nombre}}!</h1>
+                <h1 class="display-5">Universo: {{universe}}</h1>
+                <h1 class="display-5">Idioma: {{lang}}</h1>
+                <h1 class="display-5">Server: {{server}}</h1>
+                <p class="lead">Herramienta para ogame.</p>
+                <hr class="my-4">
+                <p>A cazar!.</p>
+                <a class="btn btn-primary btn-lg" href="#" role="button">Saber más</a>
+            </div>
+        </div>
+    </div>
 </div>
 
 {{> footer}}

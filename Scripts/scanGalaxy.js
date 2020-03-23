@@ -1,6 +1,7 @@
 const { Random, timeout, msToTime } = require("../utils/utils");
 const { PendingXHR } = require("pending-xhr-puppeteer");
 const Galaxy = require("../models/Galaxies");
+const config = require("../config");
 
 let scanGalaxy = async (galaxyNumber, bot) => {
   try {
@@ -19,6 +20,7 @@ let scanGalaxy = async (galaxyNumber, bot) => {
     }
     console.log("se termino de scanear g", galaxyNumber);
     let galaxy = new Galaxy({
+      server: config.SERVER,
       number: galaxyNumber,
       solarSystem: JSON.parse(JSON.stringify(solarSystemPlanets))
     });

@@ -3,13 +3,14 @@ const Player = require("../models/Players");
 const ogameApi = require("../ogameApi");
 const { PendingXHR } = require("pending-xhr-puppeteer");
 const sendTelegramMessage = require("../telegramService.js");
+const config = require("../config");
 
 async function beginHunter(nickname, bot) {
   console.log("se aplicara hunter a este jugador: ", nickname);
   console.log("empezando nueva vuelta");
   var nickname = nickname.toLowerCase();
   try {
-    let playerInfo = await Player.findOne({ nickname });
+    let playerInfo = await Player.findOne({ server: config.SERVER, nickname });
     if (!playerInfo) {
       let playerApi = await ogameApi.getPlayerInfo(nickname);
       let player = new Player({

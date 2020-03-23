@@ -18,6 +18,7 @@ const getDate = require("date-fns/getDate");
 const getHours = require("date-fns/getHours");
 const { format, utcToZonedTime } = require("date-fns-tz");
 const _ = require("underscore");
+const config = require("./config");
 
 const port = process.env.PORT || 5000;
 
@@ -59,8 +60,11 @@ let playersToHunt = [];
   await bot.login("jimenezflorestacna@gmail.com", "sed4cfv52309@");
   // await bot.login("rodrigo.diazranilla@gmail.com", "phoneypeople");
   // await bot.login("vj.jimenez96@gmail.com", "sed4cfv52309@");
-  let playersFromDB = await Player.find({}, ["nickname", "hunt"]);
-  console.log("players from db es:", playersFromDB);
+  let playersFromDB = await Player.find({ server: config.SERVER }, [
+    "nickname",
+    "hunt"
+  ]);
+  // console.log("players from db es:", playersFromDB);
   //change
   playersFromDB.forEach(player => {
     if (player.hunt) {
@@ -73,13 +77,16 @@ let playersToHunt = [];
     for (const playerToHunt of playersToHunt) {
       await hunter(playerToHunt, bot);
     }
-    await timeout(8 * 60 * 1000);
+    await timeout(15 * 60 * 1000);
   }
 })();
 
 app.get("/", (req, res) => {
   res.render("home", {
     nombre: "PepeHunter",
+    universe: config.UNIVERSE,
+    lang: config.LANGUAGE,
+    server: config.SERVER,
     anio: new Date().getFullYear(),
     path: "/"
   });
@@ -97,11 +104,15 @@ app.get("/hunter", async (req, res) => {
     skip: (parseInt(page) - 1) * parseInt(perPage) || 0,
     limit: parseInt(perPage) || 5
   };
-  let playersToHunt = await Player.find({}, null, options)
+  let playersToHunt = await Player.find(
+    { server: config.SERVER },
+    null,
+    options
+  )
     .select("-planets")
     .exec();
-  let totalPlayersToHunt = await Player.count();
-  let allPlayersToHunt = await Player.find({})
+  let totalPlayersToHunt = await Player.count({ server: config.SERVER });
+  let allPlayersToHunt = await Player.find({ server: config.SERVER })
     .select("-planets")
     .exec();
   let totalPages = Math.ceil(totalPlayersToHunt / perPage);
@@ -129,7 +140,12 @@ app.get("/hunter/:id", async (req, res) => {
 app.get("/universo", async (req, res) => {
   let galaxyNumber = req.query.galaxia || 1;
   let showRanking = req.query.ranking;
-  let galaxy = await Galaxy.findOne({ number: galaxyNumber });
+  let galaxy = await Galaxy.findOne({
+    server: config.SERVER,
+    number: galaxyNumber
+  });
+  if (!galaxy)
+    return res.render("universe", { noData: true, path: "/universo" });
   let date = formatISO9075(galaxy.createdAt);
   // console.log("el sistema solar: ", galaxy);
   let planetsIndex = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15];
@@ -153,12 +169,18 @@ app.post("/universo", async (req, res) => {
 });
 
 app.get("/tablas", async (req, res) => {
-  let players = await Player.find()
+  let players = await Player.find({ server: config.SERVER })
     .select("nickname -_id")
     .exec();
+  console.log("los jugadores son: ", players);
+  if (players.length === 0)
+    return res.render("graphics", { noData: true, path: "/tablas" });
   let nickname = req.query.nickname || "cosaco";
   let showDetails = req.query.detailed ? req.query.detailed == "true" : false;
-  let playerToHunt = await Player.findOne({ nickname: nickname.toLowerCase() });
+  let playerToHunt = await Player.findOne({
+    server: config.SERVER,
+    nickname: nickname.toLowerCase()
+  });
   // console.log("su info es: ", playerToHunt);
   let planets = playerToHunt.planets;
   var x = 60; //minutes interval
@@ -264,7 +286,8 @@ app.post("/api/players", async (req, res) => {
       nickname: playerInfo.nickname,
       planets: playerInfo.planets,
       notes: "",
-      hunt: true
+      hunt: true,
+      server: SERVER.config
     });
     console.log("agregando a este jugador: ", player);
     playerInfo = await player.save();
@@ -288,7 +311,7 @@ app.post("/api/players/planet", async (req, res) => {
     planetType: body.planetType,
     activities: []
   };
-  let playerToUpdate = await Player.findOne({ nickname })
+  let playerToUpdate = await Player.findOne({ server: config.SERVER, nickname })
     .select("-planets.activities")
     .exec();
   playerToUpdate.planets.push(newPlanet);
@@ -320,7 +343,7 @@ app.get("/api/players/:id", async (req, res) => {
     console.log("recibi este id: ", playerId);
     let playerInfo;
     if (playerId) {
-      playerInfo = await Player.findOne({ id: playerId })
+      playerInfo = await Player.findOne({ server: config.SERVER, id: playerId })
         .select("-planets.activities")
         .exec();
     } else playerInfo = [];
@@ -337,8 +360,8 @@ app.get("/api/players", async (req, res) => {
     let playersToHunt;
     if (nickname) {
       nickname = nickname.toLowerCase();
-      playersToHunt = await Player.find({ nickname });
-    } else playersToHunt = await Player.find();
+      playersToHunt = await Player.find({ server: config.SERVER, nickname });
+    } else playersToHunt = await Player.find({ server: config.SERVER });
     res.json({ ok: true, playersToHunt });
   } catch (error) {
     res.json({ ok: false, msg: "algo salio mal..." });
@@ -354,12 +377,12 @@ app.post("/api/hunter", (req, res) => {
 });
 
 app.get("/api/hunteados", (req, res) => {
-  res.json({ playersToHunt });
+  res.json({ server: config.SERVER, playersToHunt });
 });
 
 app.get("/api/scan", async (req, res) => {
   let nickname = req.query.nickname.toLowerCase();
-  let playerInfo = await Player.findOne({ nickname })
+  let playerInfo = await Player.findOne({ server: config.SERVER, nickname })
     .select("-planets.activities")
     .exec();
   if (!playerInfo) {
@@ -396,23 +419,13 @@ app.get("/api/scan", async (req, res) => {
 
 app.get("/api/scan/universe", async (req, res) => {
   res.json({ ok: true, msg: "Empezando a escanear universo" });
-  console.log("se termino la actualizacion");
+  //eliminando scan anterior
+  let galaxies = await Galaxy.deleteMany({ server: config.SERVER });
   for (let i = 1; i <= 6; i++) {
-    await scanGalaxy(String(i), bot);
+    scanGalaxy(String(i), bot);
     // await timeout(5 * 1000);
   }
-
-  for (let number = 1; number <= 6; number++) {
-    let galaxy = await Galaxy.findOne({ number: String(number) });
-    for (let i = 0; i < galaxy.solarSystem.length; i++) {
-      for (let j = 0; j < 15; j++) {
-        galaxy.solarSystem[i][j].coords = `${number}:${i + 1}:${j + 1}`;
-      }
-    }
-    galaxy.markModified("solarSystem");
-    let newGalaxy = await galaxy.save();
-  }
-
+  console.log("se termino de escanear el universo");
   return;
 });
 

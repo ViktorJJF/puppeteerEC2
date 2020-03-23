@@ -4,6 +4,7 @@ let Schema = mongoose.Schema;
 
 let playersSchema = new Schema({
   id: String,
+  server: String,
   nickname: {
     unique: true,
     type: String,

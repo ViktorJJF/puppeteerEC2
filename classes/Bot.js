@@ -3,6 +3,7 @@ const moment = require("moment");
 const { timeout } = require("../utils/utils.js");
 const uuidv1 = require("uuid/v1");
 const { PendingXHR } = require("pending-xhr-puppeteer");
+const config = require("../config");
 
 module.exports = class Bot {
   constructor() {
@@ -136,7 +137,11 @@ module.exports = class Bot {
 
   async createNewPage() {
     let mainMenuUrl =
-      "https://s167-es.ogame.gameforge.com/game/index.php?page=ingame&component=overview&relogin=1";
+      "https://" +
+      config.SERVER +
+      "-" +
+      config.LANGUAGE +
+      ".ogame.gameforge.com/game/index.php?page=ingame&component=overview&relogin=1";
     let page = await this.browser.newPage();
     page.setDefaultTimeout(30000);
     await page.goto(mainMenuUrl, { waitUntil: "networkidle0", timeout: 0 });

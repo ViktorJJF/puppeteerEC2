@@ -1,14 +1,15 @@
 const Galaxy = require("../models/Galaxies");
 const Player = require("../models/Players");
 const mongoose = require("mongoose");
+const config = require("../config");
 
 let galaxies = [];
 
 let updatePlayerInfo = async playerId => {
-  // let player = await Player.findOne({ id: playerId })
+  // let player = await Player.findOne({ server: config.SERVER,id: playerId })
   //   .select("-planets.activities")
   //   .exec();
-  let player = await Player.findOne({ id: playerId });
+  let player = await Player.findOne({ server: config.SERVER, id: playerId });
   console.log("actualizando info de: ", player.nickname);
   let planets = player.planets;
   let scanPlanets = [];
@@ -115,7 +116,7 @@ let deletePlanets = (currentPlanets, scanPlanets, propertyToCompare) => {
     }
   );
   galaxies = await Galaxy.find({});
-  let playersToHunt = await Player.find()
+  let playersToHunt = await Player.find({ server: config.SERVER })
     .select("-planets.activities")
     .exec();
   for (const player of playersToHunt) {
