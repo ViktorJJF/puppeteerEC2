@@ -6,7 +6,6 @@ let playersSchema = new Schema({
   id: String,
   server: String,
   nickname: {
-    unique: true,
     type: String,
     required: [true, "el nick del jugador es necesario!"]
   },

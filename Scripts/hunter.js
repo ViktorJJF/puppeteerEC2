@@ -4,6 +4,7 @@ const ogameApi = require("../ogameApi");
 const { PendingXHR } = require("pending-xhr-puppeteer");
 const sendTelegramMessage = require("../telegramService.js");
 const config = require("../config");
+const autoWatchdog = require("../Scripts/autoWatchDog");
 
 async function beginHunter(nickname, bot) {
   console.log("se aplicara hunter a este jugador: ", nickname);
@@ -51,7 +52,11 @@ async function beginHunter(nickname, bot) {
       // }
     }
     if (!isOn) {
-      console.log(playerInfo.nickname, " esta of!");
+      //si estoy off y anteriormente estaba on
+      if (playerInfo.isOn == true) {
+        autoWatchdog(playerInfo.id);
+      }
+      //__________
       if (isAllOff)
         sendTelegramMessage(
           `<b>${playerInfo.nickname}</b> está <b>totalmente</b>💤💤💤`

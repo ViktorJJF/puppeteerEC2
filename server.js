@@ -7,10 +7,12 @@ const ogameApi = require("./ogameApi.js");
 const mongoose = require("mongoose");
 const Bot = require("./classes/Bot");
 const hunter = require("./Scripts/hunter.js");
+const autoWatchDog = require("./Scripts/autoWatchDog");
 const scanGalaxy = require("./Scripts/scanGalaxy.js");
 const { timeout } = require("./utils/utils.js");
 const Player = require("./models/Players");
 const Galaxy = require("./models/Galaxies");
+const BotModel = require("./models/Bots");
 const { PendingXHR } = require("pending-xhr-puppeteer");
 const formatISO9075 = require("date-fns/formatISO9075");
 const getMonth = require("date-fns/getMonth");
@@ -56,6 +58,10 @@ let playersToHunt = [];
 
 (async () => {
   //init
+  let bots = await BotModel.find({});
+  console.log("los bots son: ", bots);
+  await autoWatchDog("101039");
+  if (config.environment === "dev") return;
   await bot.begin("prod");
   await bot.login("jimenezflorestacna@gmail.com", "sed4cfv52309@");
   // await bot.login("rodrigo.diazranilla@gmail.com", "phoneypeople");
@@ -77,7 +83,7 @@ let playersToHunt = [];
     for (const playerToHunt of playersToHunt) {
       await hunter(playerToHunt, bot);
     }
-    await timeout(15 * 60 * 1000);
+    await timeout(10 * 60 * 1000);
   }
 })();
 
@@ -287,7 +293,7 @@ app.post("/api/players", async (req, res) => {
       planets: playerInfo.planets,
       notes: "",
       hunt: true,
-      server: SERVER.config
+      server: config.SERVER
     });
     console.log("agregando a este jugador: ", player);
     playerInfo = await player.save();

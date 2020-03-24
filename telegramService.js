@@ -1,8 +1,9 @@
 const axios = require("axios");
+const config = require("./config");
 
 let sendTelegramMessage = message => {
   axios
-    .post("https://pepebotogame.herokuapp.com/api/telegram/message", {
+    .post(config.PEPEBOTDOMAIN + "/api/telegram/message", {
       message
     })
     .then(res => {
