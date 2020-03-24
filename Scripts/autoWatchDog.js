@@ -18,7 +18,7 @@ let autoWatchDog = async playerId => {
   let ogameEmail;
   if (playerId === "101039") ogameEmail = "vj.jimenez96@gmail.com";
   if (playerId === "101049") ogameEmail = "juancarlosjf@outlook.com";
-  if (playerId === "101182") ogameEmail = "cs.nma18@gmail.com'";
+  if (playerId === "101182") ogameEmail = "cs.nma18@gmail.com";
   let playerInfo, botId;
   console.log("email a buscar: ", ogameEmail);
   botId = (
