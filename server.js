@@ -63,6 +63,7 @@ let playersToHunt = [];
   await bot.login("jimenezflorestacna@gmail.com", "sed4cfv52309@");
   // await bot.login("rodrigo.diazranilla@gmail.com", "phoneypeople");
   // await bot.login("vj.jimenez96@gmail.com", "sed4cfv52309@");
+  // await bot.login("cs.nma18@gmail.com", "sofia2710");
   if (config.environment === "dev") return;
   let playersFromDB = await Player.find({ server: config.SERVER }, [
     "nickname",
@@ -431,7 +432,7 @@ app.get("/api/scan/universe", async (req, res) => {
   //eliminando scan anterior
   let galaxies = await Galaxy.deleteMany({ server: config.SERVER });
   for (let i = 1; i <= 6; i++) {
-    await scanGalaxy(String(i), bot);
+    scanGalaxy(String(i), bot);
     // await timeout(5 * 1000);
   }
   console.log("se termino de escanear el universo");

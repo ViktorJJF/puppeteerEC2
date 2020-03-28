@@ -23,7 +23,7 @@ let autoWatchDog = async playerId => {
   botId = (
     await Bot.findOne({ server: config.SERVER, ogameEmail }, "_id ogameEmail")
   )._id;
-  if (!checkAllowedTime()) return;
+  // if (!checkAllowedTime()) return;
   axios
     .post(config.PEPEBOTDOMAIN + "/api/bots/" + botId + "/actions", {
       action: "watchDog",
