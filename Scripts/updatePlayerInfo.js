@@ -117,16 +117,21 @@ let deletePlanets = (currentPlanets, scanPlanets, propertyToCompare) => {
       console.log("DB online ONLINE");
     }
   );
+<<<<<<< HEAD
   galaxies = await Galaxy.find({
     server: config.SERVER
   });
   let playersToHunt = await Player.find({
       server: config.SERVER
     })
+=======
+  galaxies = await Galaxy.find({ server: config.SERVER });
+  let playersToHunt = await Player.find({ server: config.SERVER })
+>>>>>>> eb01c20480e379f101270ebaa2514efbadf5cfac
     .select("-planets.activities")
     .exec();
   for (const player of playersToHunt) {
-    await updatePlayerInfo(player.id);
+    if (player.id !== "101182") await updatePlayerInfo(player.id);
   }
   //   console.log(JSON.stringify(playersToHunt, null, "  "));
 })();

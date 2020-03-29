@@ -6,7 +6,7 @@ const getHours = require("date-fns/getHours");
 
 let autoWatchDog = async playerId => {
   console.log("empezando autoWatchdog...");
-  let playersToProtect = ["101039", "101049", "101182"];
+  let playersToProtect = ["101049", "101182"];
   let isProtected =
     playersToProtect.findIndex(
       playerToProtect => playerToProtect === playerId
@@ -16,7 +16,6 @@ let autoWatchDog = async playerId => {
   if (!isProtected) return;
 
   let ogameEmail;
-  if (playerId === "101039") ogameEmail = "vj.jimenez96@gmail.com";
   if (playerId === "101049") ogameEmail = "juancarlosjf@outlook.com";
   if (playerId === "101182") ogameEmail = "cs.nma18@gmail.com";
   let playerInfo, botId;
@@ -24,7 +23,7 @@ let autoWatchDog = async playerId => {
   botId = (
     await Bot.findOne({ server: config.SERVER, ogameEmail }, "_id ogameEmail")
   )._id;
-  if (!checkAllowedTime()) return;
+  // if (!checkAllowedTime()) return;
   axios
     .post(config.PEPEBOTDOMAIN + "/api/bots/" + botId + "/actions", {
       action: "watchDog",
