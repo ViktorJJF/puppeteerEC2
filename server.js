@@ -9,16 +9,23 @@ const Bot = require("./classes/Bot");
 const hunter = require("./Scripts/hunter.js");
 const autoWatchDog = require("./Scripts/autoWatchDog");
 const scanGalaxy = require("./Scripts/scanGalaxy.js");
-const { timeout } = require("./utils/utils.js");
+const {
+  timeout
+} = require("./utils/utils.js");
 const Player = require("./models/Players");
 const Galaxy = require("./models/Galaxies");
 const BotModel = require("./models/Bots");
-const { PendingXHR } = require("pending-xhr-puppeteer");
+const {
+  PendingXHR
+} = require("pending-xhr-puppeteer");
 const formatISO9075 = require("date-fns/formatISO9075");
 const getMonth = require("date-fns/getMonth");
 const getDate = require("date-fns/getDate");
 const getHours = require("date-fns/getHours");
-const { format, utcToZonedTime } = require("date-fns-tz");
+const {
+  format,
+  utcToZonedTime
+} = require("date-fns-tz");
 const _ = require("underscore");
 const config = require("./config");
 
@@ -35,7 +42,9 @@ app.engine(
 app.set("view engine", "hbs");
 app.set("views", __dirname + "/views");
 // parse application/x-www-form-urlencoded
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.urlencoded({
+  extended: false
+}));
 
 // parse application/json
 app.use(bodyParser.json());
@@ -43,8 +52,7 @@ app.use(bodyParser.json());
 //Helpers
 //DB
 mongoose.connect(
-  "mongodb+srv://VictorJJF:Sed4cfv52309$@cluster0-ceisv.mongodb.net/pepebot",
-  {
+  "mongodb+srv://VictorJJF:Sed4cfv52309$@cluster0-ceisv.mongodb.net/pepebot", {
     useNewUrlParser: true
   },
   (err, res) => {
@@ -57,34 +65,32 @@ let bot = new Bot();
 let playersToHunt = [];
 
 (async () => {
-  //init
-  let bots = await BotModel.find({});
-  console.log("los bots son: ", bots);
-  await autoWatchDog("101039");
-  if (config.environment === "dev") return;
+  // if (config.environment === "dev") return;
   await bot.begin("prod");
-  await bot.login("jimenezflorestacna@gmail.com", "sed4cfv52309@");
+  // await bot.login("jimenezflorestacna@gmail.com", "sed4cfv52309@");
   // await bot.login("rodrigo.diazranilla@gmail.com", "phoneypeople");
-  // await bot.login("vj.jimenez96@gmail.com", "sed4cfv52309@");
-  let playersFromDB = await Player.find({ server: config.SERVER }, [
-    "nickname",
-    "hunt"
-  ]);
+  await bot.login("vj.jimenez96@gmail.com", "sed4cfv52309@");
+  // let playersFromDB = await Player.find({
+  //   server: config.SERVER
+  // }, [
+  //   "nickname",
+  //   "hunt"
+  // ]);
   // console.log("players from db es:", playersFromDB);
   //change
-  playersFromDB.forEach(player => {
-    if (player.hunt) {
-      playersToHunt.push(player.nickname);
-    }
-  });
-  playersFromDB = null;
-  console.log("players to hunt es: ", playersToHunt);
-  while (1 == 1) {
-    for (const playerToHunt of playersToHunt) {
-      await hunter(playerToHunt, bot);
-    }
-    await timeout(10 * 60 * 1000);
-  }
+  // playersFromDB.forEach(player => {
+  //   if (player.hunt) {
+  //     playersToHunt.push(player.nickname);
+  //   }
+  // });
+  // playersFromDB = null;
+  // console.log("players to hunt es: ", playersToHunt);
+  // while (1 == 1) {
+  //   for (const playerToHunt of playersToHunt) {
+  //     await hunter(playerToHunt, bot);
+  //   }
+  //   await timeout(10 * 60 * 1000);
+  // }
 })();
 
 app.get("/", (req, res) => {
@@ -103,22 +109,30 @@ app.get("/about", (req, res) => {
 });
 
 app.get("/hunter", async (req, res) => {
-  let { page, perPage } = req.query;
+  let {
+    page,
+    perPage
+  } = req.query;
   page = page || 1;
   perPage = perPage || 5;
   let options = {
     skip: (parseInt(page) - 1) * parseInt(perPage) || 0,
     limit: parseInt(perPage) || 5
   };
-  let playersToHunt = await Player.find(
-    { server: config.SERVER },
-    null,
-    options
-  )
+  let playersToHunt = await Player.find({
+        server: config.SERVER
+      },
+      null,
+      options
+    )
     .select("-planets")
     .exec();
-  let totalPlayersToHunt = await Player.count({ server: config.SERVER });
-  let allPlayersToHunt = await Player.find({ server: config.SERVER })
+  let totalPlayersToHunt = await Player.count({
+    server: config.SERVER
+  });
+  let allPlayersToHunt = await Player.find({
+      server: config.SERVER
+    })
     .select("-planets")
     .exec();
   let totalPages = Math.ceil(totalPlayersToHunt / perPage);
@@ -151,7 +165,10 @@ app.get("/universo", async (req, res) => {
     number: galaxyNumber
   });
   if (!galaxy)
-    return res.render("universe", { noData: true, path: "/universo" });
+    return res.render("universe", {
+      noData: true,
+      path: "/universo"
+    });
   let date = formatISO9075(galaxy.createdAt);
   // console.log("el sistema solar: ", galaxy);
   let planetsIndex = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15];
@@ -167,6 +184,15 @@ app.get("/universo", async (req, res) => {
   });
 });
 
+app.get("/acciones", async (req, res) => {
+  let bots = await BotModel.find({
+    server: config.SERVER
+  });
+  res.render("actions", {
+    bots
+  });
+});
+
 app.post("/universo", async (req, res) => {
   let galaxy = req.body.galaxy;
   let showRanking = req.body.showRanking == "on" ? true : false;
@@ -175,12 +201,17 @@ app.post("/universo", async (req, res) => {
 });
 
 app.get("/tablas", async (req, res) => {
-  let players = await Player.find({ server: config.SERVER })
+  let players = await Player.find({
+      server: config.SERVER
+    })
     .select("nickname -_id")
     .exec();
   console.log("los jugadores son: ", players);
   if (players.length === 0)
-    return res.render("graphics", { noData: true, path: "/tablas" });
+    return res.render("graphics", {
+      noData: true,
+      path: "/tablas"
+    });
   let nickname = req.query.nickname || "cosaco";
   let showDetails = req.query.detailed ? req.query.detailed == "true" : false;
   let playerToHunt = await Player.findOne({
@@ -269,7 +300,10 @@ app.post("/tablas", (req, res) => {
 
 app.get("/api/hunter", async (req, res) => {
   let playerInfo = await ogameApi.getPlayerInfo("Emperor Fidis");
-  res.json({ ok: true, playerInfo });
+  res.json({
+    ok: true,
+    playerInfo
+  });
 });
 // app.get("/api/graphics", async (req, res) => {
 //   let nickname=req.query.nickname;
@@ -317,7 +351,10 @@ app.post("/api/players/planet", async (req, res) => {
     planetType: body.planetType,
     activities: []
   };
-  let playerToUpdate = await Player.findOne({ server: config.SERVER, nickname })
+  let playerToUpdate = await Player.findOne({
+      server: config.SERVER,
+      nickname
+    })
     .select("-planets.activities")
     .exec();
   playerToUpdate.planets.push(newPlanet);
@@ -326,7 +363,9 @@ app.post("/api/players/planet", async (req, res) => {
 });
 
 app.post("/api/activities", (req, res) => {
-  Player.find({ nickname: "Emperor Fidis" }).exec((err, playerInfo) => {
+  Player.find({
+    nickname: "Emperor Fidis"
+  }).exec((err, playerInfo) => {
     if (err) {
       return res.status(400).json({
         ok: false,
@@ -349,13 +388,22 @@ app.get("/api/players/:id", async (req, res) => {
     console.log("recibi este id: ", playerId);
     let playerInfo;
     if (playerId) {
-      playerInfo = await Player.findOne({ server: config.SERVER, id: playerId })
+      playerInfo = await Player.findOne({
+          server: config.SERVER,
+          id: playerId
+        })
         .select("-planets.activities")
         .exec();
     } else playerInfo = [];
-    res.json({ ok: true, playerInfo });
+    res.json({
+      ok: true,
+      playerInfo
+    });
   } catch (error) {
-    res.json({ ok: false, msg: "algo salio mal..." });
+    res.json({
+      ok: false,
+      msg: "algo salio mal..."
+    });
     console.log(error);
   }
 });
@@ -366,11 +414,22 @@ app.get("/api/players", async (req, res) => {
     let playersToHunt;
     if (nickname) {
       nickname = nickname.toLowerCase();
-      playersToHunt = await Player.find({ server: config.SERVER, nickname });
-    } else playersToHunt = await Player.find({ server: config.SERVER });
-    res.json({ ok: true, playersToHunt });
+      playersToHunt = await Player.find({
+        server: config.SERVER,
+        nickname
+      });
+    } else playersToHunt = await Player.find({
+      server: config.SERVER
+    });
+    res.json({
+      ok: true,
+      playersToHunt
+    });
   } catch (error) {
-    res.json({ ok: false, msg: "algo salio mal..." });
+    res.json({
+      ok: false,
+      msg: "algo salio mal..."
+    });
   }
 });
 
@@ -383,12 +442,18 @@ app.post("/api/hunter", (req, res) => {
 });
 
 app.get("/api/hunteados", (req, res) => {
-  res.json({ server: config.SERVER, playersToHunt });
+  res.json({
+    server: config.SERVER,
+    playersToHunt
+  });
 });
 
 app.get("/api/scan", async (req, res) => {
   let nickname = req.query.nickname.toLowerCase();
-  let playerInfo = await Player.findOne({ server: config.SERVER, nickname })
+  let playerInfo = await Player.findOne({
+      server: config.SERVER,
+      nickname
+    })
     .select("-planets.activities")
     .exec();
   if (!playerInfo) {
@@ -412,21 +477,32 @@ app.get("/api/scan", async (req, res) => {
         }
       }
       await page.close();
-      res.json({ ok: true, playerInfo });
+      res.json({
+        ok: true,
+        playerInfo
+      });
     } catch (error) {
       console.log("se dio un error en scan..probablemente el logeo");
       console.log("el error es: ", error);
       await bot.checkLoginStatus(page);
     }
   } else {
-    res.json({ ok: true, playerInfo: {} });
+    res.json({
+      ok: true,
+      playerInfo: {}
+    });
   }
 });
 
 app.get("/api/scan/universe", async (req, res) => {
-  res.json({ ok: true, msg: "Empezando a escanear universo" });
+  res.json({
+    ok: true,
+    msg: "Empezando a escanear universo"
+  });
   //eliminando scan anterior
-  let galaxies = await Galaxy.deleteMany({ server: config.SERVER });
+  let galaxies = await Galaxy.deleteMany({
+    server: config.SERVER
+  });
   for (let i = 1; i <= 6; i++) {
     scanGalaxy(String(i), bot);
     // await timeout(5 * 1000);

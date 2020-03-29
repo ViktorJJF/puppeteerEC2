@@ -9,7 +9,10 @@ let updatePlayerInfo = async playerId => {
   // let player = await Player.findOne({ server: config.SERVER,id: playerId })
   //   .select("-planets.activities")
   //   .exec();
-  let player = await Player.findOne({ server: config.SERVER, id: playerId });
+  let player = await Player.findOne({
+    server: config.SERVER,
+    id: playerId
+  });
   console.log("actualizando info de: ", player.nickname);
   let planets = player.planets;
   let scanPlanets = [];
@@ -106,8 +109,7 @@ let deletePlanets = (currentPlanets, scanPlanets, propertyToCompare) => {
 
 (async () => {
   mongoose.connect(
-    "mongodb+srv://VictorJJF:Sed4cfv52309$@cluster0-ceisv.mongodb.net/pepebot",
-    {
+    "mongodb+srv://VictorJJF:Sed4cfv52309$@cluster0-ceisv.mongodb.net/pepebot", {
       useNewUrlParser: true
     },
     (err, res) => {
@@ -115,8 +117,12 @@ let deletePlanets = (currentPlanets, scanPlanets, propertyToCompare) => {
       console.log("DB online ONLINE");
     }
   );
-  galaxies = await Galaxy.find({});
-  let playersToHunt = await Player.find({ server: config.SERVER })
+  galaxies = await Galaxy.find({
+    server: config.SERVER
+  });
+  let playersToHunt = await Player.find({
+      server: config.SERVER
+    })
     .select("-planets.activities")
     .exec();
   for (const player of playersToHunt) {
