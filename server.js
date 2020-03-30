@@ -65,43 +65,17 @@ let bot = new Bot();
 let playersToHunt = [];
 
 (async () => {
-<<<<<<< HEAD
-  // if (config.environment === "dev") return;
-=======
   //init
-  if (config.environment === "dev") return;
->>>>>>> eb01c20480e379f101270ebaa2514efbadf5cfac
+  // if (config.environment === "dev") return;
   await bot.begin("prod");
   // await bot.login("jimenezflorestacna@gmail.com", "sed4cfv52309@");
   // await bot.login("rodrigo.diazranilla@gmail.com", "phoneypeople");
-<<<<<<< HEAD
-  await bot.login("vj.jimenez96@gmail.com", "sed4cfv52309@");
-  // let playersFromDB = await Player.find({
-  //   server: config.SERVER
-  // }, [
-  //   "nickname",
-  //   "hunt"
-  // ]);
-  // console.log("players from db es:", playersFromDB);
-  //change
-  // playersFromDB.forEach(player => {
-  //   if (player.hunt) {
-  //     playersToHunt.push(player.nickname);
-  //   }
-  // });
-  // playersFromDB = null;
-  // console.log("players to hunt es: ", playersToHunt);
-  // while (1 == 1) {
-  //   for (const playerToHunt of playersToHunt) {
-  //     await hunter(playerToHunt, bot);
-  //   }
-  //   await timeout(10 * 60 * 1000);
-  // }
-=======
   // await bot.login("vj.jimenez96@gmail.com", "sed4cfv52309@");
-  // await bot.login("cs.nma18@gmail.com", "sofia2710");
+  await bot.login("cs.nma18@gmail.com", "sofia2710");
   if (config.environment === "dev") return;
-  let playersFromDB = await Player.find({ server: config.SERVER }, [
+  let playersFromDB = await Player.find({
+    server: config.SERVER
+  }, [
     "nickname",
     "hunt"
   ]);
@@ -117,9 +91,8 @@ let playersToHunt = [];
     for (const playerToHunt of playersToHunt) {
       await hunter(playerToHunt, bot);
     }
-    await timeout(10 * 60 * 1000);
+    await timeout(8 * 60 * 1000);
   }
->>>>>>> eb01c20480e379f101270ebaa2514efbadf5cfac
 })();
 
 app.get("/", (req, res) => {
@@ -139,7 +112,10 @@ app.get("/about", (req, res) => {
 
 app.get("/acciones", async (req, res) => {
   let bots = await BotModel.find({}).lean();
-  res.render("actions", { path: "/acciones", bots: bots });
+  res.render("actions", {
+    path: "/acciones",
+    bots: bots
+  });
 });
 
 app.get("/hunter", async (req, res) => {
@@ -235,28 +211,19 @@ app.post("/universo", async (req, res) => {
 });
 
 app.get("/tablas", async (req, res) => {
-<<<<<<< HEAD
   let players = await Player.find({
       server: config.SERVER
     })
-=======
-  let players = await Player.find({ server: config.SERVER })
     .lean()
->>>>>>> eb01c20480e379f101270ebaa2514efbadf5cfac
     .select("nickname -_id")
     .exec();
   console.log("los jugadores son: ", players);
   if (players.length === 0)
-<<<<<<< HEAD
     return res.render("graphics", {
       noData: true,
       path: "/tablas"
     });
-  let nickname = req.query.nickname || "cosaco";
-=======
-    return res.render("graphics", { noData: true, path: "/tablas" });
   let nickname = req.query.nickname || players[0].nickname;
->>>>>>> eb01c20480e379f101270ebaa2514efbadf5cfac
   let showDetails = req.query.detailed ? req.query.detailed == "true" : false;
   let playerToHunt = await Player.findOne({
     server: config.SERVER,

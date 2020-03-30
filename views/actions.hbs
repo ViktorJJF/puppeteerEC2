@@ -3,48 +3,30 @@
 {{> navbar }}
 
 <div class="container mt-5">
-<<<<<<< HEAD
   <div class="row">
-    {{#each bots as bot}}
-    <div class="col-sm-4">
-      <div class="card" style="width: 18rem;">
-        <div class="card-header">{{ bot.ogameEmail }}</div>
-        <ul class="list-group list-group-flush">
-          <li class="list-group-item">Cras justo odio</li>
-          <li class="list-group-item">Dapibus ac facilisis in</li>
-          <li class="list-group-item">Vestibulum at eros</li>
-        </ul>
+    {{#each bots as |bot i|}}
+    <div class="d-flex justify-content-center">
+      <div class="col-sm-6">
+        <div class="card bg-primary mb-3" style="width: 18rem;">
+          <div class="card-header text-white">
+            <b>Bot {{index i}}:</b> {{ ogameEmail }}
+          </div>
+          <ul class="list-group list-group-flush">
+            {{#each actions }}
+            <li class="list-group-item">
+              <b>{{ this.type }}:</b>
+              {{#if this.active}}
+              <span class="offState">Activo</span>
+              {{else}}
+              <span class="onState">Inactivo</span>
+              {{/if}}
+            </li>
+            {{/each}}
+          </ul>
+        </div>
       </div>
     </div>
     {{/each}}
   </div>
 </div>
-
 {{> footer}}
-=======
-    <div class="row">
-        {{#each bots as |bot i|}}
-        <div class="d-flex justify-content-center">
-            <div class="col-sm-6">
-                <div class="card bg-primary mb-3" style="width: 18rem;">
-                    <div class="card-header text-white">
-                        <b>Bot {{index i}}:</b> {{ogameEmail}}
-                    </div>
-                    <ul class="list-group list-group-flush">
-                        {{#each actions }}
-                        <li class="list-group-item"> <b>{{this.type}}:</b>
-                            {{#if this.active}}
-                            <span class="offState">Activo</span>
-                            {{else}}
-                            <span class="onState">Inactivo</span>
-                            {{/if}}</li>
-                        {{/each}}
-                    </ul>
-                </div>
-            </div>
-        </div>
-        {{/each}}
-    </div>
-</div>
-{{> footer}}
->>>>>>> eb01c20480e379f101270ebaa2514efbadf5cfac
