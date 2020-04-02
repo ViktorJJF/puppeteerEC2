@@ -1,7 +1,13 @@
-const { Random, timeout, msToTime } = require("../utils/utils");
+const {
+  Random,
+  timeout,
+  msToTime
+} = require("../utils/utils");
 const Player = require("../models/Players");
 const ogameApi = require("../ogameApi");
-const { PendingXHR } = require("pending-xhr-puppeteer");
+const {
+  PendingXHR
+} = require("pending-xhr-puppeteer");
 const sendTelegramMessage = require("../telegramService.js");
 const config = require("../config");
 const autoWatchdog = require("../Scripts/autoWatchDog");
@@ -11,7 +17,10 @@ async function beginHunter(nickname, bot) {
   console.log("empezando nueva vuelta");
   var nickname = nickname.toLowerCase();
   try {
-    let playerInfo = await Player.findOne({ server: config.SERVER, nickname });
+    let playerInfo = await Player.findOne({
+      server: config.SERVER,
+      nickname
+    });
     if (!playerInfo) {
       let playerApi = await ogameApi.getPlayerInfo(nickname);
       let player = new Player({
@@ -34,8 +43,7 @@ async function beginHunter(nickname, bot) {
       isAllOff = true;
     for (const planet of playerInfo.planets) {
       // if (planet.active) {
-      if (planet.planetType === "planet") {
-      }
+      if (planet.planetType === "planet") {}
       let activity = await bot.checkPlanetActivity(
         planet.coords,
         planet.planetType,
