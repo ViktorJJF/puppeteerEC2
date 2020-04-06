@@ -67,13 +67,13 @@ async function beginHunter(nickname, bot) {
       //__________
       if (isAllOff)
         sendTelegramMessage(
-          `<b>${playerInfo.nickname}</b> está <b>totalmente</b>💤💤💤`
+          `<b>${playerInfo.nickname}[${playerInfo.planets[0].coords}]</b> está <b>totalmente</b>💤💤💤`
         );
       else if (playerInfo.isOn == false)
         sendTelegramMessage(
-          `<b>${playerInfo.nickname}</b> sigue 💤💤💤 desde el anterior scaneo`
+          `<b>${playerInfo.nickname}[${playerInfo.planets[0].coords}]</b> sigue 💤💤💤 desde el anterior scaneo`
         );
-      else sendTelegramMessage(`<b>${playerInfo.nickname}</b> está 💤💤💤`);
+      else sendTelegramMessage(`<b>${playerInfo.nickname}[${playerInfo.planets[0].coords}]</b> está 💤💤💤`);
       playerInfo.isOn = false;
     }
     if (isOn) {
