@@ -91,7 +91,7 @@ let playersToHunt = [];
     for (const playerToHunt of playersToHunt) {
       await hunter(playerToHunt, bot);
     }
-    await timeout(8 * 60 * 1000);
+    await timeout(3 * 60 * 1000);
   }
 })();
 
@@ -173,7 +173,7 @@ app.get("/universo", async (req, res) => {
   let galaxy = await Galaxy.findOne({
     server: config.SERVER,
     number: galaxyNumber
-  }).lean();
+  });
   if (!galaxy)
     return res.render("universe", {
       noData: true,
@@ -214,7 +214,7 @@ app.get("/tablas", async (req, res) => {
   let players = await Player.find({
       server: config.SERVER
     })
-    .lean()
+
     .select("nickname -_id")
     .exec();
   console.log("los jugadores son: ", players);
