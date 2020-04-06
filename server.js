@@ -29,13 +29,17 @@ app.use(express.static(__dirname + "/public"));
 app.engine(
   "hbs",
   hbs.express4({
-    partialsDir: __dirname + "/views/partials"
+    partialsDir: __dirname + "/views/partials",
   })
 );
 app.set("view engine", "hbs");
 app.set("views", __dirname + "/views");
 // parse application/x-www-form-urlencoded
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(
+  bodyParser.urlencoded({
+    extended: false,
+  })
+);
 
 // parse application/json
 app.use(bodyParser.json());
@@ -45,7 +49,7 @@ app.use(bodyParser.json());
 mongoose.connect(
   "mongodb+srv://VictorJJF:Sed4cfv52309$@cluster0-ceisv.mongodb.net/pepebot",
   {
-    useNewUrlParser: true
+    useNewUrlParser: true,
   },
   (err, res) => {
     if (err) throw err;
@@ -61,17 +65,19 @@ let playersToHunt = [];
   // if (config.environment === "dev") return;
   await bot.begin("prod");
   // await bot.login("jimenezflorestacna@gmail.com", "sed4cfv52309@");
-  // await bot.login("rodrigo.diazranilla@gmail.com", "phoneypeople");
+  await bot.login("rodrigo.diazranilla@gmail.com", "phoneypeople");
   // await bot.login("vj.jimenez96@gmail.com", "sed4cfv52309@");
-  await bot.login("cs.nma18@gmail.com", "sofia2710");
+  // await bot.login("cs.nma18@gmail.com", "sofia2710");
   if (config.environment === "dev") return;
-  let playersFromDB = await Player.find({ server: config.SERVER }, [
-    "nickname",
-    "hunt"
-  ]);
+  let playersFromDB = await Player.find(
+    {
+      server: config.SERVER,
+    },
+    ["nickname", "hunt"]
+  );
   // console.log("players from db es:", playersFromDB);
   //change
-  playersFromDB.forEach(player => {
+  playersFromDB.forEach((player) => {
     if (player.hunt) {
       playersToHunt.push(player.nickname);
     }
@@ -81,7 +87,7 @@ let playersToHunt = [];
     for (const playerToHunt of playersToHunt) {
       await hunter(playerToHunt, bot);
     }
-    await timeout(10 * 60 * 1000);
+    await timeout(3 * 60 * 1000);
   }
 })();
 
@@ -92,7 +98,7 @@ app.get("/", (req, res) => {
     lang: config.LANGUAGE,
     server: config.SERVER,
     anio: new Date().getFullYear(),
-    path: "/"
+    path: "/",
   });
 });
 
@@ -102,7 +108,10 @@ app.get("/about", (req, res) => {
 
 app.get("/acciones", async (req, res) => {
   let bots = await BotModel.find({}).lean();
-  res.render("actions", { path: "/acciones", bots: bots });
+  res.render("actions", {
+    path: "/acciones",
+    bots: bots,
+  });
 });
 
 app.get("/hunter", async (req, res) => {
@@ -111,17 +120,23 @@ app.get("/hunter", async (req, res) => {
   perPage = perPage || 5;
   let options = {
     skip: (parseInt(page) - 1) * parseInt(perPage) || 0,
-    limit: parseInt(perPage) || 5
+    limit: parseInt(perPage) || 5,
   };
   let playersToHunt = await Player.find(
-    { server: config.SERVER },
+    {
+      server: config.SERVER,
+    },
     null,
     options
   )
     .select("-planets")
     .exec();
-  let totalPlayersToHunt = await Player.count({ server: config.SERVER });
-  let allPlayersToHunt = await Player.find({ server: config.SERVER })
+  let totalPlayersToHunt = await Player.count({
+    server: config.SERVER,
+  });
+  let allPlayersToHunt = await Player.find({
+    server: config.SERVER,
+  })
     .select("-planets")
     .exec();
   let totalPages = Math.ceil(totalPlayersToHunt / perPage);
@@ -132,7 +147,7 @@ app.get("/hunter", async (req, res) => {
     perPage,
     totalPages,
     allPlayersToHunt,
-    path: "/hunter"
+    path: "/hunter",
   });
 });
 
@@ -151,10 +166,13 @@ app.get("/universo", async (req, res) => {
   let showRanking = req.query.ranking;
   let galaxy = await Galaxy.findOne({
     server: config.SERVER,
-    number: galaxyNumber
-  }).lean();
+    number: galaxyNumber,
+  });
   if (!galaxy)
-    return res.render("universe", { noData: true, path: "/universo" });
+    return res.render("universe", {
+      noData: true,
+      path: "/universo",
+    });
   let date = formatISO9075(galaxy.createdAt);
   // console.log("el sistema solar: ", galaxy);
   let planetsIndex = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15];
@@ -166,7 +184,16 @@ app.get("/universo", async (req, res) => {
     showRanking,
     galaxyNumber,
     date,
-    path: "/universo"
+    path: "/universo",
+  });
+});
+
+app.get("/acciones", async (req, res) => {
+  let bots = await BotModel.find({
+    server: config.SERVER,
+  });
+  res.render("actions", {
+    bots,
   });
 });
 
@@ -178,18 +205,23 @@ app.post("/universo", async (req, res) => {
 });
 
 app.get("/tablas", async (req, res) => {
-  let players = await Player.find({ server: config.SERVER })
-    .lean()
+  let players = await Player.find({
+    server: config.SERVER,
+  })
+
     .select("nickname -_id")
     .exec();
   console.log("los jugadores son: ", players);
   if (players.length === 0)
-    return res.render("graphics", { noData: true, path: "/tablas" });
+    return res.render("graphics", {
+      noData: true,
+      path: "/tablas",
+    });
   let nickname = req.query.nickname || players[0].nickname;
   let showDetails = req.query.detailed ? req.query.detailed == "true" : false;
   let playerToHunt = await Player.findOne({
     server: config.SERVER,
-    nickname: nickname.toLowerCase()
+    nickname: nickname.toLowerCase(),
   });
   // console.log("su info es: ", playerToHunt);
   let planets = playerToHunt.planets;
@@ -215,7 +247,7 @@ app.get("/tablas", async (req, res) => {
     // planetActivities.forEach(date => {
     //   console.log(getDate(date.date));
     // });
-    let group = _.groupBy(planet.activities, date => {
+    let group = _.groupBy(planet.activities, (date) => {
       const parisTimeZone = "America/Lima";
       let localeDate = utcToZonedTime(date.date, parisTimeZone);
       return getDate(localeDate);
@@ -228,7 +260,7 @@ app.get("/tablas", async (req, res) => {
       if (date.hasOwnProperty(day)) {
         // date[day] = [];
         let intervals = [];
-        let hours = _.groupBy(date[day], hour => {
+        let hours = _.groupBy(date[day], (hour) => {
           return getHours(hour.date);
         });
         times.forEach((hourInterval, idx) => {
@@ -261,7 +293,7 @@ app.get("/tablas", async (req, res) => {
     dates,
     totalDays,
     showDetails,
-    path: "/tablas"
+    path: "/tablas",
   });
 });
 
@@ -273,7 +305,10 @@ app.post("/tablas", (req, res) => {
 
 app.get("/api/hunter", async (req, res) => {
   let playerInfo = await ogameApi.getPlayerInfo("Emperor Fidis");
-  res.json({ ok: true, playerInfo });
+  res.json({
+    ok: true,
+    playerInfo,
+  });
 });
 // app.get("/api/graphics", async (req, res) => {
 //   let nickname=req.query.nickname;
@@ -297,7 +332,7 @@ app.post("/api/players", async (req, res) => {
       planets: playerInfo.planets,
       notes: "",
       hunt: true,
-      server: config.SERVER
+      server: config.SERVER,
     });
     console.log("agregando a este jugador: ", player);
     playerInfo = await player.save();
@@ -319,9 +354,12 @@ app.post("/api/players/planet", async (req, res) => {
     name: body.name,
     coords: body.coords,
     planetType: body.planetType,
-    activities: []
+    activities: [],
   };
-  let playerToUpdate = await Player.findOne({ server: config.SERVER, nickname })
+  let playerToUpdate = await Player.findOne({
+    server: config.SERVER,
+    nickname,
+  })
     .select("-planets.activities")
     .exec();
   playerToUpdate.planets.push(newPlanet);
@@ -330,19 +368,21 @@ app.post("/api/players/planet", async (req, res) => {
 });
 
 app.post("/api/activities", (req, res) => {
-  Player.find({ nickname: "Emperor Fidis" }).exec((err, playerInfo) => {
+  Player.find({
+    nickname: "Emperor Fidis",
+  }).exec((err, playerInfo) => {
     if (err) {
       return res.status(400).json({
         ok: false,
-        err
+        err,
       });
     }
     let planets = playerInfo[0].planets;
-    planets.forEach(planet => {
+    planets.forEach((planet) => {
       console.log(planet);
     });
     res.json({
-      ok: true
+      ok: true,
     });
   });
 });
@@ -353,13 +393,22 @@ app.get("/api/players/:id", async (req, res) => {
     console.log("recibi este id: ", playerId);
     let playerInfo;
     if (playerId) {
-      playerInfo = await Player.findOne({ server: config.SERVER, id: playerId })
+      playerInfo = await Player.findOne({
+        server: config.SERVER,
+        id: playerId,
+      })
         .select("-planets.activities")
         .exec();
     } else playerInfo = [];
-    res.json({ ok: true, playerInfo });
+    res.json({
+      ok: true,
+      playerInfo,
+    });
   } catch (error) {
-    res.json({ ok: false, msg: "algo salio mal..." });
+    res.json({
+      ok: false,
+      msg: "algo salio mal...",
+    });
     console.log(error);
   }
 });
@@ -370,11 +419,23 @@ app.get("/api/players", async (req, res) => {
     let playersToHunt;
     if (nickname) {
       nickname = nickname.toLowerCase();
-      playersToHunt = await Player.find({ server: config.SERVER, nickname });
-    } else playersToHunt = await Player.find({ server: config.SERVER });
-    res.json({ ok: true, playersToHunt });
+      playersToHunt = await Player.find({
+        server: config.SERVER,
+        nickname,
+      });
+    } else
+      playersToHunt = await Player.find({
+        server: config.SERVER,
+      });
+    res.json({
+      ok: true,
+      playersToHunt,
+    });
   } catch (error) {
-    res.json({ ok: false, msg: "algo salio mal..." });
+    res.json({
+      ok: false,
+      msg: "algo salio mal...",
+    });
   }
 });
 
@@ -387,12 +448,18 @@ app.post("/api/hunter", (req, res) => {
 });
 
 app.get("/api/hunteados", (req, res) => {
-  res.json({ server: config.SERVER, playersToHunt });
+  res.json({
+    server: config.SERVER,
+    playersToHunt,
+  });
 });
 
 app.get("/api/scan", async (req, res) => {
   let nickname = req.query.nickname.toLowerCase();
-  let playerInfo = await Player.findOne({ server: config.SERVER, nickname })
+  let playerInfo = await Player.findOne({
+    server: config.SERVER,
+    nickname,
+  })
     .select("-planets.activities")
     .exec();
   if (!playerInfo) {
@@ -416,21 +483,32 @@ app.get("/api/scan", async (req, res) => {
         }
       }
       await page.close();
-      res.json({ ok: true, playerInfo });
+      res.json({
+        ok: true,
+        playerInfo,
+      });
     } catch (error) {
       console.log("se dio un error en scan..probablemente el logeo");
       console.log("el error es: ", error);
       await bot.checkLoginStatus(page);
     }
   } else {
-    res.json({ ok: true, playerInfo: {} });
+    res.json({
+      ok: true,
+      playerInfo: {},
+    });
   }
 });
 
 app.get("/api/scan/universe", async (req, res) => {
-  res.json({ ok: true, msg: "Empezando a escanear universo" });
+  res.json({
+    ok: true,
+    msg: "Empezando a escanear universo",
+  });
   //eliminando scan anterior
-  let galaxies = await Galaxy.deleteMany({ server: config.SERVER });
+  let galaxies = await Galaxy.deleteMany({
+    server: config.SERVER,
+  });
   for (let i = 1; i <= 6; i++) {
     scanGalaxy(String(i), bot);
     // await timeout(5 * 1000);

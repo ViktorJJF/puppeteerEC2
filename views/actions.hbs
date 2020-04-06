@@ -3,28 +3,30 @@
 {{> navbar }}
 
 <div class="container mt-5">
-    <div class="row">
-        {{#each bots as |bot i|}}
-        <div class="d-flex justify-content-center">
-            <div class="col-sm-6">
-                <div class="card bg-primary mb-3" style="width: 18rem;">
-                    <div class="card-header text-white">
-                        <b>Bot {{index i}}:</b> {{ogameEmail}}
-                    </div>
-                    <ul class="list-group list-group-flush">
-                        {{#each actions }}
-                        <li class="list-group-item"> <b>{{this.type}}:</b>
-                            {{#if this.active}}
-                            <span class="offState">Activo</span>
-                            {{else}}
-                            <span class="onState">Inactivo</span>
-                            {{/if}}</li>
-                        {{/each}}
-                    </ul>
-                </div>
-            </div>
+  <div class="row">
+    {{#each bots as |bot i|}}
+    <div class="d-flex justify-content-center">
+      <div class="col-sm-6">
+        <div class="card bg-primary mb-3" style="width: 18rem;">
+          <div class="card-header text-white">
+            <b>Bot {{index i}}:</b> {{ ogameEmail }}
+          </div>
+          <ul class="list-group list-group-flush">
+            {{#each actions }}
+            <li class="list-group-item">
+              <b>{{ this.type }}:</b>
+              {{#if this.active}}
+              <span class="offState">Activo</span>
+              {{else}}
+              <span class="onState">Inactivo</span>
+              {{/if}}
+            </li>
+            {{/each}}
+          </ul>
         </div>
-        {{/each}}
+      </div>
     </div>
+    {{/each}}
+  </div>
 </div>
 {{> footer}}

@@ -11,7 +11,10 @@ async function beginHunter(nickname, bot) {
   console.log("empezando nueva vuelta");
   var nickname = nickname.toLowerCase();
   try {
-    let playerInfo = await Player.findOne({ server: config.SERVER, nickname });
+    let playerInfo = await Player.findOne({
+      server: config.SERVER,
+      nickname,
+    });
     if (!playerInfo) {
       let playerApi = await ogameApi.getPlayerInfo(nickname);
       let player = new Player({
@@ -19,7 +22,7 @@ async function beginHunter(nickname, bot) {
         nickname: playerApi.nickname,
         planets: playerApi.planets,
         isOn: true,
-        notes: ""
+        notes: "",
       });
       playerInfo = await player.save();
     }
@@ -59,13 +62,16 @@ async function beginHunter(nickname, bot) {
       //__________
       if (isAllOff)
         sendTelegramMessage(
-          `<b>${playerInfo.nickname}</b> está <b>totalmente</b>💤💤💤`
+          `<b>${playerInfo.nickname}</b> [${playerInfo.planets[0].coords}] está <b>totalmente</b>💤💤💤`
         );
       else if (playerInfo.isOn == false)
         sendTelegramMessage(
-          `<b>${playerInfo.nickname}</b> sigue 💤💤💤 desde el anterior scaneo`
+          `<b>${playerInfo.nickname}</b> [${playerInfo.planets[0].coords}] sigue 💤💤💤 desde el anterior scaneo`
         );
-      else sendTelegramMessage(`<b>${playerInfo.nickname}</b> está 💤💤💤`);
+      else
+        sendTelegramMessage(
+          `<b>${playerInfo.nickname}</b> [${playerInfo.planets[0].coords}] está 💤💤💤`
+        );
       playerInfo.isOn = false;
     }
     if (isOn) {

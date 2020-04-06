@@ -1,8 +1,12 @@
 const puppeteer = require("puppeteer");
 const moment = require("moment");
-const { timeout } = require("../utils/utils.js");
+const {
+  timeout
+} = require("../utils/utils.js");
 const uuidv1 = require("uuid/v1");
-const { PendingXHR } = require("pending-xhr-puppeteer");
+const {
+  PendingXHR
+} = require("pending-xhr-puppeteer");
 const config = require("../config");
 
 module.exports = class Bot {
@@ -15,8 +19,8 @@ module.exports = class Bot {
     this.language = null;
     this.telegramGroupId = null;
     this.telegramId = null;
-    this.ogameEmail = "jimenezflorestacna@gmail.com";
-    this.ogamePassword = "sed4cfv52309@";
+    this.ogameEmail = "rodrigo.diazranilla@gmail.com";
+    this.ogamePassword = "phoneypeople";
     this.state = null;
     this.userId = null;
     this.page = null;
@@ -94,16 +98,18 @@ module.exports = class Bot {
       await page.click('input[type="email"]');
       await page.type(
         'input[type="email"]',
-        ogameEmail ? ogameEmail : this.ogameEmail,
-        { delay: this.typingDelay }
+        ogameEmail ? ogameEmail : this.ogameEmail, {
+          delay: this.typingDelay
+        }
       );
 
       await page.waitForSelector('input[type="password"]');
       await page.click('input[type="password"]');
       await page.type(
         'input[type="password"]',
-        ogamePassword ? ogamePassword : this.ogamePassword,
-        { delay: this.typingDelay }
+        ogamePassword ? ogamePassword : this.ogamePassword, {
+          delay: this.typingDelay
+        }
       );
       await page.waitForSelector(
         "#loginTab > #loginForm > p > .button-primary > span"
@@ -143,8 +149,11 @@ module.exports = class Bot {
       config.LANGUAGE +
       ".ogame.gameforge.com/game/index.php?page=ingame&component=overview&relogin=1";
     let page = await this.browser.newPage();
-    page.setDefaultTimeout(30000);
-    await page.goto(mainMenuUrl, { waitUntil: "networkidle0", timeout: 0 });
+    page.setDefaultTimeout(10000);
+    await page.goto(mainMenuUrl, {
+      waitUntil: "networkidle0",
+      timeout: 0
+    });
     return page;
   }
 
@@ -178,16 +187,21 @@ module.exports = class Bot {
         await page.close();
         break;
       case "playPage":
-        console.log("nos encontramos en vista playPage");
-        await page.waitForSelector("#joinGame>a>button.button");
-        await page.click("#joinGame>a>button.button");
-        await page.waitForSelector('.rt-td.action-cell>button[type="button"]');
-        page = await this.clickAndWaitForTarget(
-          '.rt-td.action-cell>button[type="button"]',
-          page,
-          this.browser
-        );
-        await page.close();
+        try {
+          console.log("nos encontramos en vista playPage");
+          await page.waitForSelector("#joinGame>a>button.button");
+          await page.click("#joinGame>a>button.button");
+          await page.waitForSelector('.rt-td.action-cell>button[type="button"]');
+          page = await this.clickAndWaitForTarget(
+            '.rt-td.action-cell>button[type="button"]',
+            page,
+            this.browser
+          );
+          await page.close();
+        } catch (error) {
+          console.log("se dio un error en playpage");
+          await this.checkLoginStatus(page);
+        }
         break;
       case "selectUniversePage":
         console.log("nos encontramos en vista universo");
@@ -237,8 +251,9 @@ module.exports = class Bot {
 
     //Click to overview enemy missions
     await page.waitForSelector(
-      "#notificationbarcomponent > #message-wrapper > #messages_collapsed #js_eventDetailsClosed",
-      { visible: true }
+      "#notificationbarcomponent > #message-wrapper > #messages_collapsed #js_eventDetailsClosed", {
+        visible: true
+      }
     );
     await page.click(
       "#notificationbarcomponent > #message-wrapper > #messages_collapsed #js_eventDetailsClosed"
@@ -258,8 +273,16 @@ module.exports = class Bot {
           var attackDetail = {
             hostilePlayer: {
               name: "",
-              origin: { planetName: "", coords: "", type: "" },
-              target: { planetName: "", coords: "", type: "" },
+              origin: {
+                planetName: "",
+                coords: "",
+                type: ""
+              },
+              target: {
+                planetName: "",
+                coords: "",
+                type: ""
+              },
               impactHour: "",
               timeRemaining: ""
             },
@@ -275,10 +298,10 @@ module.exports = class Bot {
             "td.originFleet"
           ).innerText;
           attackDetail.hostilePlayer.origin.type = enemyMission.querySelector(
-            "td.originFleet>figure.moon"
-          )
-            ? "moon"
-            : "planet";
+              "td.originFleet>figure.moon"
+            ) ?
+            "moon" :
+            "planet";
 
           attackDetail.hostilePlayer.target.coords = enemyMission
             .querySelector("td.destCoords")
@@ -287,10 +310,10 @@ module.exports = class Bot {
             "td.destFleet"
           ).innerText;
           attackDetail.hostilePlayer.target.type = enemyMission.querySelector(
-            "td.destFleet>figure.moon"
-          )
-            ? "moon"
-            : "planet";
+              "td.destFleet>figure.moon"
+            ) ?
+            "moon" :
+            "planet";
           //impacto hour
           attackDetail.hostilePlayer.impactHour = parseInt(
             enemyMission.getAttribute("data-arrival-time") * 1000
@@ -435,9 +458,9 @@ module.exports = class Bot {
       const pendingXHR = new PendingXHR(page);
     }
     await pendingXHR.waitForAllXhrFinished();
-    planetType == "planet"
-      ? console.log(player, "Empezando a escanear planeta: ", coords)
-      : console.log(player, "Empezando a escanear luna: ", coords);
+    planetType == "planet" ?
+      console.log(player, "Empezando a escanear planeta: ", coords) :
+      console.log(player, "Empezando a escanear luna: ", coords);
     // await timeout(500);
     let planetExist;
     if (planetType == "planet") {
@@ -475,13 +498,17 @@ module.exports = class Bot {
     };
 
     planetActivity.lastActivity = await page.evaluate(
-      ({ planet, planetType, coords }) => {
+      ({
+        planet,
+        planetType,
+        coords
+      }) => {
         console.log("estamos en coordenadas: ", coords);
         var lastActivity = "off";
         let planetSelector = document.querySelector(
-          planetType == "planet"
-            ? `tr.row>td[rel="planet${planet}"]>.ListImage`
-            : `tr.row>td[rel="moon${planet}"]`
+          planetType == "planet" ?
+          `tr.row>td[rel="planet${planet}"]>.ListImage` :
+          `tr.row>td[rel="moon${planet}"]`
         );
         if (planetSelector.querySelector(".activity")) {
           if (planetSelector.querySelector(".activity.showMinutes")) {
@@ -493,8 +520,7 @@ module.exports = class Bot {
         }
         console.log("la actividad fue: ", lastActivity);
         return lastActivity;
-      },
-      {
+      }, {
         planet,
         planetType,
         coords
@@ -535,25 +561,25 @@ module.exports = class Bot {
         // });
         planetJson.name = await planet.evaluate(e => {
           let planetNameSelector = e.querySelector("td.planetname");
-          return planetNameSelector
-            ? planetNameSelector.innerText
-            : "Desconocido...";
+          return planetNameSelector ?
+            planetNameSelector.innerText :
+            "Desconocido...";
         });
         planetJson.playerName = await planet.evaluate(e =>
-          e.querySelector("td.playername>a>span")
-            ? e.querySelector("td.playername>a>span").innerText
-            : null
+          e.querySelector("td.playername>a>span") ?
+          e.querySelector("td.playername>a>span").innerText :
+          null
         );
         planetJson.rank = await planet.evaluate(e =>
-          e.querySelector(".uv-galaxy-rank")
-            ? e.querySelector(".uv-galaxy-rank").innerText
-            : 0
+          e.querySelector(".uv-galaxy-rank") ?
+          e.querySelector(".uv-galaxy-rank").innerText :
+          0
         );
         planetJson.honor = (await planet.evaluate(e =>
-          e.querySelector(".status_abbr_honorableTarget")
-        ))
-          ? true
-          : false;
+            e.querySelector(".status_abbr_honorableTarget")
+          )) ?
+          true :
+          false;
         planetJson.state = await planet.evaluate(e => {
           let bandit1 = e.querySelector(".honorRank.rank_bandit1");
           let bandit2 = e.querySelector(".honorRank.rank_bandit2");
@@ -562,22 +588,22 @@ module.exports = class Bot {
           let inactive = e.querySelector(".status_abbr_inactive");
           let green = e.querySelector(".status_abbr_noob");
           let vacation = e.querySelector(".status_abbr_vacation");
-          return vacation
-            ? "vacation"
-            : inactive
-            ? "inactive"
-            : green
-            ? "green"
-            : bandit
-            ? "bandit"
-            : "normal";
+          return vacation ?
+            "vacation" :
+            inactive ?
+            "inactive" :
+            green ?
+            "green" :
+            bandit ?
+            "bandit" :
+            "normal";
         });
         // planetJson.militaryInfo = militaryInfo;
         planetJson.moon = (await planet.evaluate(e =>
-          e.querySelector(".moon.js_no_action")
-        ))
-          ? false
-          : true;
+            e.querySelector(".moon.js_no_action")
+          )) ?
+          false :
+          true;
         let [galaxy, system] = coords.split(":");
         planetJson.coords = `${galaxy}:${system}:${position}`;
         planetJson.playerId = await planet.evaluate(e => {
@@ -664,8 +690,9 @@ module.exports = class Bot {
 
       await this.page.type(
         "#contentWrapper > #chatContent > .content > .editor_wrap > .new_msg_textarea",
-        msg,
-        { delay: this.typingDelay / 2 }
+        msg, {
+          delay: this.typingDelay / 2
+        }
       );
 
       await this.page.waitForSelector(
@@ -728,8 +755,9 @@ module.exports = class Bot {
     let fleetOverviewButton = await page.$("p.event_list");
     if (fleetOverviewButton) {
       await page.waitForSelector(
-        "#notificationbarcomponent > #message-wrapper > #messages_collapsed #js_eventDetailsClosed",
-        { visible: true }
+        "#notificationbarcomponent > #message-wrapper > #messages_collapsed #js_eventDetailsClosed", {
+          visible: true
+        }
       );
       await page.click(
         "#notificationbarcomponent > #message-wrapper > #messages_collapsed #js_eventDetailsClosed"
@@ -759,25 +787,28 @@ module.exports = class Bot {
 
       slots.current = parseInt(
         document
-          .querySelector("#slots>.fleft>span")
-          .innerText.match(/([0-9])/)[0]
+        .querySelector("#slots>.fleft>span")
+        .innerText.match(/([0-9])/)[0]
       );
       slots.all = parseInt(
         document
-          .querySelector("#slots>.fleft>span")
-          .innerText.match(/([^\/]+$)/)[0]
+        .querySelector("#slots>.fleft>span")
+        .innerText.match(/([^\/]+$)/)[0]
       );
       slots.expInUse = parseInt(
         document
-          .querySelector("#slots>.fleft:nth-child(2)>span")
-          .innerText.match(/([0-9])/)[0]
+        .querySelector("#slots>.fleft:nth-child(2)>span")
+        .innerText.match(/([0-9])/)[0]
       );
       slots.expTotal = parseInt(
         document
-          .querySelector("#slots>.fleft:nth-child(2)>span")
-          .innerText.match(/([^\/]+$)/)[0]
+        .querySelector("#slots>.fleft:nth-child(2)>span")
+        .innerText.match(/([^\/]+$)/)[0]
       );
-      return { fleets, slots };
+      return {
+        fleets,
+        slots
+      };
     });
     return fleetDetails;
   }
@@ -839,7 +870,11 @@ module.exports = class Bot {
   addAction(type, payload = {}) {
     console.log("se recibio este action:", type);
     let actionId = uuidv1();
-    this.actions.push({ actionId, type, payload });
+    this.actions.push({
+      actionId,
+      type,
+      payload
+    });
     return actionId;
   }
   async stopAction(type) {
