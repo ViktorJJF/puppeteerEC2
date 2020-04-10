@@ -1,12 +1,8 @@
 const puppeteer = require("puppeteer");
 const moment = require("moment");
-const {
-  timeout
-} = require("../utils/utils.js");
+const { timeout } = require("../utils/utils.js");
 const uuidv1 = require("uuid/v1");
-const {
-  PendingXHR
-} = require("pending-xhr-puppeteer");
+const { PendingXHR } = require("pending-xhr-puppeteer");
 const config = require("../config");
 
 module.exports = class Bot {
@@ -63,12 +59,12 @@ module.exports = class Bot {
         headless: false,
         args: [
           `--disable-extensions-except=${pathToExtension}`,
-          `--load-extension=${pathToExtension}`
-        ]
+          `--load-extension=${pathToExtension}`,
+        ],
       });
     } else {
       this.browser = await puppeteer.launch({
-        args: ["--no-sandbox", "--disable-setuid-sandbox"]
+        args: ["--no-sandbox", "--disable-setuid-sandbox"],
       });
     }
 
@@ -98,8 +94,9 @@ module.exports = class Bot {
       await page.click('input[type="email"]');
       await page.type(
         'input[type="email"]',
-        ogameEmail ? ogameEmail : this.ogameEmail, {
-          delay: this.typingDelay
+        ogameEmail ? ogameEmail : this.ogameEmail,
+        {
+          delay: this.typingDelay,
         }
       );
 
@@ -107,8 +104,9 @@ module.exports = class Bot {
       await page.click('input[type="password"]');
       await page.type(
         'input[type="password"]',
-        ogamePassword ? ogamePassword : this.ogamePassword, {
-          delay: this.typingDelay
+        ogamePassword ? ogamePassword : this.ogamePassword,
+        {
+          delay: this.typingDelay,
         }
       );
       await page.waitForSelector(
@@ -116,7 +114,7 @@ module.exports = class Bot {
       );
       await page.click("#loginTab > #loginForm > p > .button-primary > span");
       await page.waitForSelector("div > #joinGame > a > .button > span", {
-        timeout: 3000
+        timeout: 3000,
       });
       await page.click("div > #joinGame > a > .button > span");
 
@@ -149,10 +147,10 @@ module.exports = class Bot {
       config.LANGUAGE +
       ".ogame.gameforge.com/game/index.php?page=ingame&component=overview&relogin=1";
     let page = await this.browser.newPage();
-    page.setDefaultTimeout(10000);
+    page.setDefaultTimeout(30000);
     await page.goto(mainMenuUrl, {
       waitUntil: "networkidle0",
-      timeout: 0
+      timeout: 0,
     });
     return page;
   }
@@ -191,7 +189,9 @@ module.exports = class Bot {
           console.log("nos encontramos en vista playPage");
           await page.waitForSelector("#joinGame>a>button.button");
           await page.click("#joinGame>a>button.button");
-          await page.waitForSelector('.rt-td.action-cell>button[type="button"]');
+          await page.waitForSelector(
+            '.rt-td.action-cell>button[type="button"]'
+          );
           page = await this.clickAndWaitForTarget(
             '.rt-td.action-cell>button[type="button"]',
             page,
@@ -251,8 +251,9 @@ module.exports = class Bot {
 
     //Click to overview enemy missions
     await page.waitForSelector(
-      "#notificationbarcomponent > #message-wrapper > #messages_collapsed #js_eventDetailsClosed", {
-        visible: true
+      "#notificationbarcomponent > #message-wrapper > #messages_collapsed #js_eventDetailsClosed",
+      {
+        visible: true,
       }
     );
     await page.click(
@@ -269,24 +270,24 @@ module.exports = class Bot {
       if (isEnemy) {
         let fleet = await enemyMission.$("td.icon_movement");
         await fleet.hover();
-        var attackDetail = await enemyMission.evaluate(enemyMission => {
+        var attackDetail = await enemyMission.evaluate((enemyMission) => {
           var attackDetail = {
             hostilePlayer: {
               name: "",
               origin: {
                 planetName: "",
                 coords: "",
-                type: ""
+                type: "",
               },
               target: {
                 planetName: "",
                 coords: "",
-                type: ""
+                type: "",
               },
               impactHour: "",
-              timeRemaining: ""
+              timeRemaining: "",
             },
-            ships: []
+            ships: [],
           };
           attackDetail.hostilePlayer.origin.coords = enemyMission
             .querySelector("td.coordsOrigin")
@@ -298,10 +299,10 @@ module.exports = class Bot {
             "td.originFleet"
           ).innerText;
           attackDetail.hostilePlayer.origin.type = enemyMission.querySelector(
-              "td.originFleet>figure.moon"
-            ) ?
-            "moon" :
-            "planet";
+            "td.originFleet>figure.moon"
+          )
+            ? "moon"
+            : "planet";
 
           attackDetail.hostilePlayer.target.coords = enemyMission
             .querySelector("td.destCoords")
@@ -310,10 +311,10 @@ module.exports = class Bot {
             "td.destFleet"
           ).innerText;
           attackDetail.hostilePlayer.target.type = enemyMission.querySelector(
-              "td.destFleet>figure.moon"
-            ) ?
-            "moon" :
-            "planet";
+            "td.destFleet>figure.moon"
+          )
+            ? "moon"
+            : "planet";
           //impacto hour
           attackDetail.hostilePlayer.impactHour = parseInt(
             enemyMission.getAttribute("data-arrival-time") * 1000
@@ -328,7 +329,7 @@ module.exports = class Bot {
             if (index > 0) {
               var shipJson = {
                 name: "",
-                qty: 0
+                qty: 0,
               };
               try {
                 shipJson.name = ship.querySelector("td").innerText;
@@ -383,7 +384,7 @@ module.exports = class Bot {
     if (galaxyCurrentValue !== galaxy) {
       await page.click(galaxyInputSelector);
       await page.type(galaxyInputSelector, galaxy, {
-        delay: this.typingDelay
+        delay: this.typingDelay,
       });
     }
     let systemInputSelector = "#system_input";
@@ -394,7 +395,7 @@ module.exports = class Bot {
     if (systemCurrentValue !== system) {
       await page.click(systemInputSelector);
       await page.type(systemInputSelector, system, {
-        delay: this.typingDelay
+        delay: this.typingDelay,
       });
     }
     if (galaxyCurrentValue !== galaxy || systemCurrentValue !== system) {
@@ -458,9 +459,9 @@ module.exports = class Bot {
       const pendingXHR = new PendingXHR(page);
     }
     await pendingXHR.waitForAllXhrFinished();
-    planetType == "planet" ?
-      console.log(player, "Empezando a escanear planeta: ", coords) :
-      console.log(player, "Empezando a escanear luna: ", coords);
+    planetType == "planet"
+      ? console.log(player, "Empezando a escanear planeta: ", coords)
+      : console.log(player, "Empezando a escanear luna: ", coords);
     // await timeout(500);
     let planetExist;
     if (planetType == "planet") {
@@ -474,7 +475,7 @@ module.exports = class Bot {
       console.log("el planeta no existe");
       return {
         date: new Date(),
-        lastActivity: null
+        lastActivity: null,
       };
     }
     // if (planetType == "planet")
@@ -494,21 +495,17 @@ module.exports = class Bot {
     // await timeout(2500);
     var planetActivity = {
       date: new Date(),
-      lastActivity: null
+      lastActivity: null,
     };
 
     planetActivity.lastActivity = await page.evaluate(
-      ({
-        planet,
-        planetType,
-        coords
-      }) => {
+      ({ planet, planetType, coords }) => {
         console.log("estamos en coordenadas: ", coords);
         var lastActivity = "off";
         let planetSelector = document.querySelector(
-          planetType == "planet" ?
-          `tr.row>td[rel="planet${planet}"]>.ListImage` :
-          `tr.row>td[rel="moon${planet}"]`
+          planetType == "planet"
+            ? `tr.row>td[rel="planet${planet}"]>.ListImage`
+            : `tr.row>td[rel="moon${planet}"]`
         );
         if (planetSelector.querySelector(".activity")) {
           if (planetSelector.querySelector(".activity.showMinutes")) {
@@ -520,10 +517,11 @@ module.exports = class Bot {
         }
         console.log("la actividad fue: ", lastActivity);
         return lastActivity;
-      }, {
+      },
+      {
         planet,
         planetType,
-        coords
+        coords,
       }
     );
     console.log(player, "Estado: ", planetActivity.lastActivity);
@@ -559,28 +557,28 @@ module.exports = class Bot {
         //     shipsQty: shipsQty ? shipsQty.innerText : 0
         //   };
         // });
-        planetJson.name = await planet.evaluate(e => {
+        planetJson.name = await planet.evaluate((e) => {
           let planetNameSelector = e.querySelector("td.planetname");
-          return planetNameSelector ?
-            planetNameSelector.innerText :
-            "Desconocido...";
+          return planetNameSelector
+            ? planetNameSelector.innerText
+            : "Desconocido...";
         });
-        planetJson.playerName = await planet.evaluate(e =>
-          e.querySelector("td.playername>a>span") ?
-          e.querySelector("td.playername>a>span").innerText :
-          null
+        planetJson.playerName = await planet.evaluate((e) =>
+          e.querySelector("td.playername>a>span")
+            ? e.querySelector("td.playername>a>span").innerText
+            : null
         );
-        planetJson.rank = await planet.evaluate(e =>
-          e.querySelector(".uv-galaxy-rank") ?
-          e.querySelector(".uv-galaxy-rank").innerText :
-          0
+        planetJson.rank = await planet.evaluate((e) =>
+          e.querySelector(".uv-galaxy-rank")
+            ? e.querySelector(".uv-galaxy-rank").innerText
+            : 0
         );
-        planetJson.honor = (await planet.evaluate(e =>
-            e.querySelector(".status_abbr_honorableTarget")
-          )) ?
-          true :
-          false;
-        planetJson.state = await planet.evaluate(e => {
+        planetJson.honor = (await planet.evaluate((e) =>
+          e.querySelector(".status_abbr_honorableTarget")
+        ))
+          ? true
+          : false;
+        planetJson.state = await planet.evaluate((e) => {
           let bandit1 = e.querySelector(".honorRank.rank_bandit1");
           let bandit2 = e.querySelector(".honorRank.rank_bandit2");
           let bandit3 = e.querySelector(".honorRank.rank_bandit3");
@@ -588,25 +586,25 @@ module.exports = class Bot {
           let inactive = e.querySelector(".status_abbr_inactive");
           let green = e.querySelector(".status_abbr_noob");
           let vacation = e.querySelector(".status_abbr_vacation");
-          return vacation ?
-            "vacation" :
-            inactive ?
-            "inactive" :
-            green ?
-            "green" :
-            bandit ?
-            "bandit" :
-            "normal";
+          return vacation
+            ? "vacation"
+            : inactive
+            ? "inactive"
+            : green
+            ? "green"
+            : bandit
+            ? "bandit"
+            : "normal";
         });
         // planetJson.militaryInfo = militaryInfo;
-        planetJson.moon = (await planet.evaluate(e =>
-            e.querySelector(".moon.js_no_action")
-          )) ?
-          false :
-          true;
+        planetJson.moon = (await planet.evaluate((e) =>
+          e.querySelector(".moon.js_no_action")
+        ))
+          ? false
+          : true;
         let [galaxy, system] = coords.split(":");
         planetJson.coords = `${galaxy}:${system}:${position}`;
-        planetJson.playerId = await planet.evaluate(e => {
+        planetJson.playerId = await planet.evaluate((e) => {
           let playerId = e.querySelector("td.action a.sendMail");
           return playerId ? playerId.getAttribute("data-playerid") : 0;
         });
@@ -667,7 +665,7 @@ module.exports = class Bot {
       await this.page.click("#searchText");
 
       await this.page.type("#searchText", nickname, {
-        delay: this.typingDelay
+        delay: this.typingDelay,
       });
 
       await this.page.waitForSelector(
@@ -690,8 +688,9 @@ module.exports = class Bot {
 
       await this.page.type(
         "#contentWrapper > #chatContent > .content > .editor_wrap > .new_msg_textarea",
-        msg, {
-          delay: this.typingDelay / 2
+        msg,
+        {
+          delay: this.typingDelay / 2,
         }
       );
 
@@ -713,7 +712,7 @@ module.exports = class Bot {
     const pageTarget = page.target(); //save this to know that this was the opener
     await page.click(clickSelector); //click on a link
     const newTarget = await browser.waitForTarget(
-      target => target.opener() === pageTarget
+      (target) => target.opener() === pageTarget
     ); //check that you opened this page, rather than just checking the url
     const newPage = await newTarget.page(); //get the page object
     // await newPage.once("load",()=>{}); //this doesn't work; wait till page is loaded
@@ -744,8 +743,8 @@ module.exports = class Bot {
         expTotal: null,
         expInUse: null,
         all: null,
-        current: null
-      }
+        current: null,
+      },
     };
     //go to fleet view
     await this.goToPage("fleet", page);
@@ -755,8 +754,9 @@ module.exports = class Bot {
     let fleetOverviewButton = await page.$("p.event_list");
     if (fleetOverviewButton) {
       await page.waitForSelector(
-        "#notificationbarcomponent > #message-wrapper > #messages_collapsed #js_eventDetailsClosed", {
-          visible: true
+        "#notificationbarcomponent > #message-wrapper > #messages_collapsed #js_eventDetailsClosed",
+        {
+          visible: true,
         }
       );
       await page.click(
@@ -773,41 +773,41 @@ module.exports = class Bot {
         expTotal: null,
         expInUse: null,
         all: null,
-        current: null
+        current: null,
       };
       var fleetEvents = document.querySelectorAll("tr.eventFleet");
       console.log("fleet events es de tamaño: ", fleetEvents.length);
-      fleetEvents.forEach(fleetEvent => {
+      fleetEvents.forEach((fleetEvent) => {
         fleets.push({
           missionType: fleetEvent.getAttribute("data-mission-type"),
           return: fleetEvent.getAttribute("data-return-flight"),
-          arrivalTime: fleetEvent.getAttribute("data-arrival-time")
+          arrivalTime: fleetEvent.getAttribute("data-arrival-time"),
         });
       });
 
       slots.current = parseInt(
         document
-        .querySelector("#slots>.fleft>span")
-        .innerText.match(/([0-9])/)[0]
+          .querySelector("#slots>.fleft>span")
+          .innerText.match(/([0-9])/)[0]
       );
       slots.all = parseInt(
         document
-        .querySelector("#slots>.fleft>span")
-        .innerText.match(/([^\/]+$)/)[0]
+          .querySelector("#slots>.fleft>span")
+          .innerText.match(/([^\/]+$)/)[0]
       );
       slots.expInUse = parseInt(
         document
-        .querySelector("#slots>.fleft:nth-child(2)>span")
-        .innerText.match(/([0-9])/)[0]
+          .querySelector("#slots>.fleft:nth-child(2)>span")
+          .innerText.match(/([0-9])/)[0]
       );
       slots.expTotal = parseInt(
         document
-        .querySelector("#slots>.fleft:nth-child(2)>span")
-        .innerText.match(/([^\/]+$)/)[0]
+          .querySelector("#slots>.fleft:nth-child(2)>span")
+          .innerText.match(/([^\/]+$)/)[0]
       );
       return {
         fleets,
-        slots
+        slots,
       };
     });
     return fleetDetails;
@@ -843,7 +843,7 @@ module.exports = class Bot {
     return playerInfo;
   }
   async stop() {
-    this.actions.forEach(action => {
+    this.actions.forEach((action) => {
       clearInterval(action.action);
     });
     this.actions = [];
@@ -852,17 +852,17 @@ module.exports = class Bot {
   hasAction(actionType) {
     //expeditions - watchdog - hunter
     let actionIndex = this.actions.findIndex(
-      action => action.type == actionType
+      (action) => action.type == actionType
     );
     return actionIndex > -1 ? true : false;
   }
   getActions() {
     let result = [];
-    this.actions.forEach(action => {
+    this.actions.forEach((action) => {
       result.push({
         actionId: action.actionId,
         type: action.type,
-        payload: action.payload
+        payload: action.payload,
       });
     });
     return result;
@@ -873,13 +873,13 @@ module.exports = class Bot {
     this.actions.push({
       actionId,
       type,
-      payload
+      payload,
     });
     return actionId;
   }
   async stopAction(type) {
     try {
-      let index = this.actions.findIndex(action => action.type == type);
+      let index = this.actions.findIndex((action) => action.type == type);
       this.actions.splice(this.actions[index], 1);
       console.log("ahora actions es: ", this.actions);
       return true;

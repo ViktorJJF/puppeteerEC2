@@ -62,12 +62,13 @@ let playersToHunt = [];
 
 (async () => {
   //init
-  // if (config.environment === "dev") return;
+  // require("./Scripts/updateTops");
+  if (config.environment === "dev") return;
   await bot.begin("prod");
   // await bot.login("jimenezflorestacna@gmail.com", "sed4cfv52309@");
-  await bot.login("rodrigo.diazranilla@gmail.com", "phoneypeople");
+  // await bot.login("rodrigo.diazranilla@gmail.com", "phoneypeople");
   // await bot.login("vj.jimenez96@gmail.com", "sed4cfv52309@");
-  // await bot.login("cs.nma18@gmail.com", "sofia2710");
+  await bot.login("cs.nma18@gmail.com", "sofia2710");
   if (config.environment === "dev") return;
   let playersFromDB = await Player.find(
     {
